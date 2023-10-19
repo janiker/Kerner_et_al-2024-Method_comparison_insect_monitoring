@@ -1,0 +1,223 @@
+---
+title: "Models"
+output: html_document
+---
+
+load libraries
+
+```{r libraries, include=FALSE}
+library(lmerTest)
+library(mgcv) # GAMs
+library(nlme) # linear models with random term(s)
+library(piecewiseSEM) # calculate SEMs
+library(plyr) # revalue factor levels
+library(tidymv) # GAM predictions
+library(tidyverse)
+```
+
+```{r paths, include = FALSE}
+# Create objects for easy access to the folders related to the project
+data_proc <- file.path("results", "data", "processed")
+```
+
+read data
+
+```{r loaddata, include=FALSE}
+pd<-read.csv(here::here(data_proc, "plotdata.csv"), sep=";")
+
+# transformation of not normally distributed annual temperature
+pd$tempy<-log(max(pd$tempy+1)-pd$tempy); pd$tempy<-max(pd$tempy)-pd$tempy
+```
+
+# Main text
+
+## Elevational & sampling temperature patterns
+
+### pollinators
+
+```{r methodpolldata}
+mp<-pivot_longer(data=pd, cols=c(clpolldiv, clpolldip),names_to = c("method"),values_to="spec.no") 
+
+mp$method <-revalue(mp$method, c("clpolldiv"="malaise traps", "clpolldip"="transect walks"))
+mp$method<-factor(mp$method, ordered = T) # factor needs to be ordered for ANOVA like GAM summary
+
+# adjusting sample temperature to use only sampling periods of each method
+mp$tempright <-case_when(mp$method =="transect walks" ~ mp$samplpoll,
+                         mp$method =="malaise traps" ~ mp$tempsampl)
+
+mp$plot<-as.factor(mp$plot)
+
+# Elevational pattern both methods
+pollelev<-summary(gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=mp, family=poisson, method="REML"))
+
+# Sampling temperature pattern both methods
+polltemp<-summary(gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=mp, family=poisson, method="REML"))
+
+# Sampling temperature for each method separately
+pollds<-summary(lm(spec.no~tempright+elev, data=mp[mp$method=="transect walks",]))
+
+pollms<-summary(lm(spec.no~tempright+elev, data=mp[mp$method=="malaise traps",]))
+```
+
+#### elevational bands pollinator species numbers
+
+```{r pollrichdiffelev}
+# check for significant differences in pollinator species numbers for each elevational section (lower elevations 500-1000 m, mid-elevations 1000-1500, highlands >1500 m)
+
+# T-Tests
+t1<-t.test(spec.no~method,data=mp[mp$elev<1000,])
+t2<-t.test(spec.no~method,data=mp[mp$elev>=1000 & mp$elev<1500,])
+t3<-t.test(spec.no~method,data=mp[mp$elev>=1500,])
+```
+
+### grasshoppers
+
+```{r methodordata}
+gp<-pivot_longer(data=pd, cols=c(divor, ordip),names_to = c("method"),values_to="spec.no") 
+
+gp$method <-revalue(gp$method, c("divor"="malaise traps", "ordip"="transect walks"))
+gp$method<-factor(gp$method, ordered = T) # factor needs to be ordered for ANOVA like GAM summary
+
+# adjusting sample temperature to use only sampling periods of each method
+gp$tempright <-case_when(gp$method =="transect walks" ~ gp$samplor,
+                         gp$method =="malaise traps" ~ gp$tempsampl)
+
+gp$plot<-as.factor(gp$plot)
+
+# Elevational pattern both methods
+elevor<-summary(gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=gp, family=poisson, method="REML"))
+
+# Sampling temperature pattern both methods
+tempor<-summary(gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=gp, family=poisson, method="REML"))
+```
+
+## Path models
+
+### malaise trap pollinator path model
+
+```{r pollpathfinal}
+# 1 min. model
+clpollsm<-summary(psem(pp~1,
+                  lm(flrich~manbin+pp+tempy, pd),
+                  lm(clpolldiv~flrich+tempsampl, pd),
+                  tempy %~~% tempsampl),
+                  .progressBar = F)
+clpollsm
+```
+
+### transect walk pollinator path model
+
+```{r clpolldippathfinal}
+# 1 min. model without abundance
+
+clpolldipsm<-summary(psem(pp~1,
+                    lm(flrich~manbin+pp+tempy, pd),
+                    lm(clpolldip~samplpoll+flrich, pd),
+                    tempy %~~% samplpoll),
+                  .progressBar = F)
+clpolldipsm
+```
+
+### transect walk pollinator path model including abundance
+
+```{r clpollabpathfinal}
+# with abundance included: 2 min. models, one adding annual temperature (tempy) as an explanatory variable for pollinator abundance, but p > 0.05 for tempy anyway, so decision for model without it
+
+clpollabsm<-summary(psem(pp~1,
+                    lm(flrich~manbin+pp+tempy, pd),
+                    lm(clpollab~samplpoll+flrich, pd), 
+                    lm(clpolldip~clpollab+flrich, pd),
+                    tempy %~~% samplpoll),
+                  .progressBar = F)
+clpollabsm
+```
+
+### malaise trap grasshopper path model
+
+```{r ordivpathfinal}
+# 1 min. model
+
+ordivsm<-summary(psem(pp~1,
+              lm(pldiv~manbin+pp+tempy, pd),
+              lm(divor~manbin+pp+tempy, pd),
+              tempy %~~% tempsampl),
+              .progressBar = F)
+ordivsm
+```
+
+### transect walk grasshopper path model
+
+```{r ordippathfinal}
+# 1 min. model
+
+ordipsm<-summary(psem(pp~1,
+              lm(pldiv~manbin+pp+tempy, pd),
+              lm(ordip~tempy, pd),
+              tempy %~~% samplor),
+              .progressBar = F)
+ordipsm
+```
+
+# Supplementary Material
+
+## S6. body size comparisons
+
+```{r bodysizemeth}
+MT<-read.csv(here::here(data_proc, "body_sizes.csv"), row.names = 1)
+
+body<-summary(lme(bodysize~method1, random=~1|group, data=MT[!is.na(MT$bodysize),]))
+```
+
+## S7. beta diversity
+
+```{r betadiffelev}
+bdiv<-summary(gam(betadivj~s(elev, k=4), data=pd, method="REML"))
+bdip<-summary(gam(betadipj~s(elev, k=4), data=pd, method="REML"))
+
+# check for significant differences in beta diversity for each elevational section (lower elevations 500-1000 m, mid-elevations 1000-1500, highlands >1500 m)
+
+b <- pivot_longer(cols=c(betadivj, betadipj),names_to = c("method"),values_to="beta", data=pd)
+
+# T-Tests
+b1<-t.test(beta~method,data=b[b$elev<1000,])
+b2<-t.test(beta~method,data=b[b$elev>=1000 & b$elev<1500,])
+b3<-t.test(beta~method,data=b[b$elev>=1500,])
+```
+
+## S8 & S9. Elevational & sampling temperature patterns for individual pollinator groups
+
+```{r methodspec}
+# restructure data
+sm<-pivot_longer(data=pd, cols=c(divwb, wbdip, divhv, hvdip, divbf, bfdip),names_to = c("spec.group"),values_to="spec.no") 
+sm$method <-case_when(sm$spec.group %in% c("divwb", "divhv", "divbf") ~ "malaise traps",
+            sm$spec.group %in% c("wbdip", "hvdip", "bfdip") ~ "transect walks") # define method
+sm$method<-factor(sm$method, ordered = T) # factor needs to be ordered for ANOVA like GAM summary
+
+sm$group <-case_when(sm$spec.group %in% c("divwb", "wbdip") ~ "wild bees",
+                     sm$spec.group %in% c("divhv", "hvdip") ~ "hoverflies",
+                     sm$spec.group %in% c("divbf", "bfdip") ~ "butterflies") # define species group
+sm$group<-factor(sm$group)
+
+# adjusting sample temperature to use only sampling periods of each method
+sm$tempright <-case_when(sm$spec.group =="wbdip" ~ sm$samplwb,
+                         sm$spec.group =="bfdip" ~ sm$samplbf,
+                         sm$spec.group =="hvdip" ~ sm$samplhv,
+                         sm$spec.group %in% c("divwb", "divhv", "divbf") ~ sm$tempsampl)
+
+sm$plot<-as.factor(sm$plot) # plot as factor
+
+# butterflies
+elevbf<-summary(gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=sm[sm$group=="butterflies",], family=poisson, method="REML"))
+
+tempbf<-summary(gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=sm[sm$group=="butterflies",], family=poisson, method="REML"))
+
+# wild bees
+elevwb<-summary(gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=sm[sm$group=="wild bees",], family=poisson, method="REML"))
+
+tempwb<-summary(gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=sm[sm$group=="wild bees",], family=poisson, method="REML"))
+
+# syrphids
+elevhv<-summary(gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=sm[sm$group=="hoverflies",], family=poisson, method="REML"))
+
+temphv<-summary(gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=sm[sm$group=="hoverflies",], family=poisson, method="REML"))
+```

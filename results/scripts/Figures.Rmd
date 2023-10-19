@@ -1,0 +1,1037 @@
+---
+title: "Figures"
+author: "Janika Kerner"
+output: word_document
+---
+
+load libraries
+
+```{r libraries, include=FALSE}
+library(data.table) # create empty data frame (data.table)
+library(ggplot2)
+library(grid) # grid png-files to be able to arrange them
+library(gridExtra) # arrange png-files
+library(magrittr) # pipe operators %>%, %<>%, %T>%
+library(mgcv) # GAMs
+library(patchwork) # assemble multiple graphs together
+library(piecewiseSEM) # calculate SEMs
+library(plyr) # revalue factor levels
+library(png)
+library(qgraph) # plot SEMs nicely
+library(tidymv) # GAM predictions
+library(tidyverse)
+library(VennDiagram) # venn diagrams
+```
+
+```{r set-up, include = FALSE}
+# Create objects for easy access to the folders related to the project
+data_proc <- file.path("results", "data", "processed")
+figures_dir <- file.path("text", "figures")
+suppl_dir <- file.path("text", "supplementary")
+```
+
+read data
+
+```{r loaddata, include=FALSE}
+## plot data ##
+pd<-read.csv(here::here(data_proc, "plotdata.csv"), sep=";")
+pd$plot<-as.factor(pd$plot)
+
+# transformation of not normally distributed annual temperature
+pd$tempy<-log(max(pd$tempy+1)-pd$tempy); pd$tempy<-max(pd$tempy)-pd$tempy
+```
+
+# Main text
+## 1. Venn diagrams
+
+```{r venndiagram}
+slmal<-read.csv(here::here(data_proc, "speclistmal.csv"), row.names = 1)
+sldip<-read.csv(here::here(data_proc, "speclistdip.csv"), row.names = 1)
+
+# pollinators
+venn.diagram(
+  x = list(slmal$spec[slmal$Order!="Orthoptera"], sldip$spec[sldip$Order!="Orthoptera"]),
+  category.names = c("malaise traps" , "transect walks"),
+  filename = here::here(figures_dir, "venns-single", "venndiagpoll.png"),
+  output = TRUE,
+          imagetype="png" ,
+          height = 2000, 
+          width = 2000, 
+          resolution = 600,
+          col= NA,
+          fill = c(alpha("#21908dff",0.7), alpha("#440154ff",0.7)),
+          cex = 1.1,
+          fontfamily = "sans",
+          cat.cex = 1.1,
+          cat.pos = c(340, 20),
+          cat.dist = c(0.055, 0.055),
+          cat.fontfamily = "sans",
+          cat.col = c("#21908dff", "#440154ff"),
+          disable.logging =T, # avoid creation of log.txt in figure folder
+          print.mode = c("raw", "percent"), # plot species number & percentage
+          sigdigs=2 # percent without decimal numbers
+        )
+
+# grasshoppers
+venny<-function(order, cat.name1, cat.name2, pos1, pos2, rotation, extpos, extdist, extlength, cdist, cexy) {
+  venn.diagram(
+    x = list(slmal$spec[slmal$Order==order], sldip$spec[sldip$Order==order]),
+    category.names = c(cat.name1, cat.name2),
+    filename = here::here(figures_dir, "venns-single", paste0("venndiag", order, ".png")),
+    output = TRUE,
+          imagetype="png" ,
+          height = 2000, 
+          width = 2000, 
+          resolution = 600,
+          col=NA,
+          fill = c(alpha("#21908dff",0.7), alpha("#440154ff",0.7)),
+          cex = cexy,
+          fontfamily = "sans",
+          cat.cex = cexy,
+          cat.pos = c(pos1, pos2),
+          cat.dist = c(cdist, cdist),
+          cat.fontfamily = "sans",
+          cat.col = c("#21908dff", "#440154ff"),
+          disable.logging =T, # avoid creation of log.txt in figure folder
+          print.mode = c("raw", "percent"), # plot species number & percentage
+          sigdigs=c(2,2,2), # percent without decimal numbers
+          rotation.degree=rotation,
+          ext.pos = extpos, # position of labels outside the circles
+          ext.dist = extdist, # shorten line to label outside the circles
+          ext.length = extlength
+        )
+}
+
+venny("Orthoptera", "malaise traps", "transect walks", 340, 20, 0, 60, -0.2, 0, 0.04, 1.3)
+```
+
+## 2. Elevational & sampling temperature patterns pollinators & grasshoppers
+
+```{r methpatternsfunc}
+mp<-pivot_longer(data=pd, cols=c(clpolldiv, clpolldip, divor, ordip),names_to = c("group"),values_to="spec.no") 
+mp$method <-case_when(mp$group %in% c("clpolldiv", "divor") ~ "malaise traps",
+            mp$group %in% c("clpolldip", "ordip") ~ "transect walks") # define method
+mp$method<-factor(mp$method, ordered = T) # factor needs to be ordered for ANOVA like GAM summary
+
+mp$guild <-case_when(mp$group %in% c("clpolldiv", "clpolldip") ~ "pollinators",
+            mp$group %in% c("divor", "ordip") ~ "grasshoppers") # define species groups
+mp$guild<-factor(mp$guild, ordered = T)
+
+# adjusting sample temperature to use only sampling periods of each method
+mp$tempright <-case_when(mp$group =="clpolldip" ~ mp$samplpoll,
+                         mp$group == "ordip" ~ mp$samplor,
+                         mp$group %in% c("clpolldiv", "divor") ~ mp$tempsampl)
+
+
+modpollelev<-gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method, data=mp[mp$guild=="pollinators",], method="REML")
+modpollelev<-get_gam_predictions(modpollelev, elev, series_length = (max(mp$elev)-min(mp$elev))+1)
+modpollelev$guild<-"pollinators"
+
+modorelev<-gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method, data=mp[mp$guild=="grasshoppers",], method="REML")
+modorelev<-get_gam_predictions(modorelev, elev, series_length = (max(mp$elev)-min(mp$elev))+1)
+modorelev$guild<-"grasshoppers"
+
+modpolltemp<-gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4), data=mp[mp$guild=="pollinators",], method="REML")
+modpolltemp<-get_gam_predictions(modpolltemp, tempright, series_length = 100*
+                                   (max(mp$tempright[mp$guild=="pollinators"])-min(mp$tempright[mp$guild=="pollinators"]))+1)
+
+modpolltemp<-rbind(modpolltemp[modpolltemp$method=="malaise traps" &
+                           modpolltemp$tempright>=min(mp$tempsampl) &
+                           modpolltemp$tempright<=max(mp$tempsampl),],
+               modpolltemp[modpolltemp$method=="transect walks" &
+                           modpolltemp$tempright>=min(mp$samplpoll) &
+                           modpolltemp$tempright<=max(mp$samplpoll),])
+
+modortemp<-gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+s(elev, k=4)+method, data=mp[mp$guild=="grasshoppers",], method="REML")
+modortemp<-get_gam_predictions(modortemp, tempright, series_length = 100*
+                                   (max(mp$tempright[mp$guild=="grasshoppers"])-min(mp$tempright[mp$guild=="grasshoppers"]))+1)
+modortemp$guild<-"grasshoppers"
+modortemp<-rbind(modortemp[modortemp$method=="malaise traps" &
+                           modortemp$tempright>=min(mp$tempsampl) &
+                           modortemp$tempright<=max(mp$tempsampl),],
+                 modortemp[modortemp$method=="transect walks" &
+                           modortemp$tempright>=min(mp$samplor) &
+                           modortemp$tempright<=max(mp$samplor),])
+
+
+methplot<-function (var, xaxisname, dataframe, guild, buc) {
+  ggplot(aes({{var}}, spec.no, group=method, col=method, fill=method), data=dataframe) +
+  geom_ribbon(aes(ymin = CI_lower, ymax = CI_upper), alpha=0.3, colour = NA) + # colour=NA to remove outer contours
+  geom_point(alpha=0.6, pch=16, data=mp[mp$guild==guild,]) +
+  geom_line(lwd=1)+
+  theme_classic() +
+  theme(axis.text = element_text(size=10),
+        axis.title = element_text(size=10),
+        strip.text = element_blank()) + # suppress plot labelling by facetwrap
+  labs(x=xaxisname, y="species richness") +
+  scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
+    scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"), name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
+  guides(alpha="none") + # no legend for alpha
+    annotate("text", x=-Inf, y=Inf, label=buc, hjust=-1, vjust=1, size=5)
+}
+
+# plot only points without function lines for grasshopper sampling temperature (in model not significant, only significant effect of elevation)
+methpoints<-function (var, xaxisname, dataframe, guild, buc) {
+  ggplot(aes({{var}}, spec.no, group=method, col=method, fill=method), data=dataframe) +
+  geom_point(alpha=0.6, pch=16, data=mp[mp$guild==guild,]) +
+  theme_classic() +
+  theme(axis.text = element_text(size=10),
+        axis.title = element_text(size=10),
+        strip.text = element_blank()) + # suppress plot labelling by facetwrap
+  labs(x=xaxisname, y="species richness") +
+  scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
+    scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"), name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
+  guides(alpha="none") + # no legend for alpha
+    annotate("text", x=-Inf, y=Inf, label=buc, hjust=-1, vjust=1, size=5)
+}
+
+
+png(here::here(figures_dir, "methpatterns.png"), height=15, width=18, res=600, units = "cm")
+
+((methplot(elev, "elevation [m a.s.l.]", modpollelev, "pollinators", "a)") + theme(legend.position="none") +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "clpolldiv.png")), width = .2, x=.9, y=.92))) +
+    
+    (methplot(elev, "elevation [m a.s.l.]", modorelev, "grasshoppers", "b)") + theme(legend.position="none") +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "divor.png")), width = .2, x=.9, y=.92)))) /
+  
+  ((methplot(tempright, "sampling temperature [°C]", modpolltemp, "pollinators", "c)") +
+      theme(legend.position=c(.95, .2), legend.title = element_blank(), legend.text = element_blank(), legend.background = element_blank()) +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "malaisetrap.png")), width = .14, x=.8, y=.25)) +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "kescher.png")), width = .14, x=.8, y=.1)) +
+     scale_x_continuous(breaks = c(15,20,25))) +
+     
+     (methpoints(tempright, "sampling temperature [°C]", mp, "grasshoppers", "d)") +
+     theme(legend.position="none") + scale_x_continuous(breaks = c(15,20,25))))
+
+dev.off()
+```
+
+## 3. & 4. Path models
+
+### functions
+
+```{r pathfunctions}
+#### Estimates ####
+
+# manual matrix with estimates from path model for plotting
+
+estimates<-function(v, sampltemp, div, plrich) {
+  
+  t<-matrix(c(rep(0,6*6)),6,6,byrow=T)
+
+  colnames(t)<-c(sampltemp,"tempy","pp","manbin",plrich,div) # columns (response)
+  rownames(t)<-colnames(t) # rows (predictor)
+
+  for (k in rownames(t)) {
+    for (i in colnames(t)) {
+      
+      if (i %in% v$coefficients$Predictor[v$coefficients$Response==k]){
+      t[i,k]<-v$coefficients$Std.Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k]
+      }}}
+  
+  t[sampltemp,"tempy"]<-v$coefficients$Std.Estimate[v$coefficients$Predictor==paste0("~~",sampltemp) & v$coefficients$Response=="~~tempy"]
+  t["tempy",sampltemp]<-t[sampltemp,"tempy"]
+  
+  return(t)
+}
+
+#### Variable positions ####
+
+# this matrix lists where in a 3x4 matrix the column names from table t should be placed
+l<-matrix(c(rep(0,12)),4,3)
+
+l[1,1]=1
+l[2,1]=2
+l[3,1]=3
+l[4,1]=4
+l[3,3]=5
+l[1,3]=6
+
+#### Arrow labels ####
+
+# function to transform p values into asterisks
+psign<-function(p){
+if(p<=0.001) {
+  p <- "***"
+  } else if (p<=0.01) {
+    p <- "**"
+    } else if (p<=0.05) {
+      p <- "*"
+      } else if (p<=0.1) {
+        p <- "."
+        } else {p <- "n.s."}
+  p
+}
+
+# order according to number of response variable (that's why first k, then i)
+
+edgelabels<-function(v, sampltemp, div) {
+  n<-3; sl<-c(NA, NA)
+
+  for (k in c(sampltemp,"tempy","pp","manbin","pldiv","flrich", div)) { # columns (response)
+    for (i in c(sampltemp,"tempy","pp","manbin","pldiv","flrich", div)) { # rows (predictor)
+      if (i %in% v$coefficients$Predictor[v$coefficients$Response==k]) {
+        sl[n]<-paste(round(v$coefficients$Std.Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k], 2),psign(v$coefficients$P.Value[v$coefficients$Predictor==i & v$coefficients$Response==k]))
+        n<-n+1
+      }}}
+  return(sl)
+}
+
+#### Arrow colors ####
+
+# function to transform p values into colour codes
+pcolpos<-function(p){
+if(p<=0.001) {
+  p <- "darkgreen"
+  } else if (p<=0.01) {
+    p <- "darkgreen"
+    } else if (p<=0.05) {
+      p <- "darkgreen"
+      } else if (p<=0.1) {
+        p <- "slategray2"
+        } else {p <- "slategray2"}
+  p
+}
+
+pcolneg<-function(p){
+if(p<=0.001) {
+  p <- "red4"
+  } else if (p<=0.01) {
+    p <- "red4"
+    } else if (p<=0.05) {
+      p <- "red4"
+      } else if (p<=0.1) {
+        p <- "slategray2"
+        } else {p <- "slategray2"}
+  p
+}
+
+
+edgecolors<-function(v, sampltemp, div) {
+  n<-3; sl<-c("black", "black")
+  
+for (k in c(sampltemp,"tempy","pp","manbin","pldiv","flrich", div)) { # columns (response)
+    for (i in c(sampltemp,"tempy","pp","manbin","pldiv","flrich", div)) { # rows (predictor)
+      if (i %in% v$coefficients$Predictor[v$coefficients$Response==k]) {
+        if (v$coefficients$Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k]>0){
+          sl[n]<-pcolpos(v$coefficients$P.Value[v$coefficients$Predictor==i & v$coefficients$Response==k])
+        } else if (v$coefficients$Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k]<0){
+          sl[n]<-pcolneg(v$coefficients$P.Value[v$coefficients$Predictor==i & v$coefficients$Response==k])
+        }
+        
+        n<-n+1
+      }}}
+  return(sl)
+}
+```
+
+### 3. pollinators
+#### malaise traps & transect walks
+```{r methplots}
+
+# malaise traps
+pollmalsm<-summary(psem(pp~1,
+                        lm(flrich~manbin+pp+tempy, pd),
+                        lm(clpolldiv~flrich+tempsampl, pd),
+                        tempy %~~% tempsampl),
+                  .progressBar = F)
+
+# transect walks
+polldipsm<-summary(psem(pp~1,
+                        lm(flrich~manbin+pp+tempy, pd),
+                        lm(clpolldip~samplpoll+flrich, pd),
+                        tempy %~~% samplpoll),
+                   .progressBar = F)
+
+# Estimates
+tpollmal<-estimates(pollmalsm, "tempsampl", "clpolldiv", "flrich")
+tpolldip<-estimates(polldipsm, "samplpoll", "clpolldip", "flrich")
+
+# Edge labels
+elpollmal<-edgelabels(pollmalsm, "tempsampl", "clpolldiv")
+elpolldip<-edgelabels(polldipsm, "samplpoll", "clpolldip")
+
+#Edge colors
+ecpollmal<-edgecolors(pollmalsm, "tempsampl", "clpolldiv")
+ecpolldip<-edgecolors(polldipsm, "samplpoll", "clpolldip")
+
+# plot
+plotpaths<-function(div, plrich, sampltemp, method, edgevaluematrix, edgecolor, edgelabel, pathmodel, letter) {
+
+  png(here::here(figures_dir, "sems-single", paste0(div, "sm.png")), height=9, width=8, res=600, units = "cm")
+
+  plot(qgraph(edgevaluematrix, shape="square", layout=l, labels=F, vsize=18, esize=8, edge.color=edgecolor, colFactor=0, asize=6, edge.labels=edgelabel, edge.label.bg=c(NA, NA, rep("white", length(edgelabel)-2)), edge.label.cex=1.8, edge.label.margin=0.025, edge.label.position=0.7, mar=c(3,4,3,3), images=c( # edge.label.position normal 0.5
+    here::here(figures_dir, "logos", paste0(sampltemp, ".png")),
+    here::here(figures_dir, "logos", "tempy.png"),
+    here::here(figures_dir, "logos", "pp.png"),
+    here::here(figures_dir, "logos", "manbin.png"),
+    here::here(figures_dir, "logos", paste0(plrich, ".png")),
+    here::here(figures_dir, "logos", paste0(div, ".png"))), 
+    borders = F # no border lines around logos
+        ) %>% inset2("Edgelist", (.) %>% extract2("Edgelist") %>% inset2("bidirectional", c(TRUE,TRUE, rep(FALSE,length(edgelabel)-2)))) # correct temperature to double arrow
+        ); grid.raster(readPNG(here::here(figures_dir, "logos", paste0(method, ".png"))), width = .17, x=.9, y=.78 # add method logo, coordinates before x .75, y .78
+        ); text(1,1.25,paste("R²=",pathmodel$R2$R.squared[pathmodel$R2$Response==div]),cex=.8
+        ); text(1,-0.65,paste("R²=",pathmodel$R2$R.squared[pathmodel$R2$Response==plrich]),cex=.8
+        ); text(-1.25,1.1,letter,cex=1.3
+        ); text(0.4,-1.1,paste("Fisher's C =", pathmodel$Cstat$Fisher.C, "\np-value = ", pathmodel$Cstat$P.Value), adj=0, cex=.7)
+  
+  dev.off()
+}
+
+plotpaths("clpolldiv", "flrich", "tempsampl", "malaisetrap", tpollmal, ecpollmal, elpollmal, pollmalsm, "a)")
+plotpaths("clpolldip", "flrich", "sampldip", "kescher", tpolldip, ecpolldip, elpolldip, polldipsm, "b)")
+
+pathpollmal<-readPNG(here::here(figures_dir, "sems-single", "clpolldivsm.png"))
+pathpolldip<-readPNG(here::here(figures_dir, "sems-single", "clpolldipsm.png"))
+```
+
+#### transect walks with abundance
+
+```{r abplot}
+pollabsm<-summary(psem(pp~1,
+                      lm(flrich~manbin+pp+tempy, pd),
+                      lm(clpollab~samplpoll+flrich, pd), 
+                      lm(clpolldip~clpollab+flrich, pd),
+                      tempy %~~% samplpoll),
+                  .progressBar = F)
+
+#### Estimates ####
+
+# manual matrix with estimates from path model for plotting
+
+estimates2<-function(v, sampltemp, div, ab, plrich) {
+  
+  t<-matrix(c(rep(0,7*7)),7,7,byrow=T)
+
+  colnames(t)<-c(sampltemp,"tempy","pp","manbin",plrich,div,ab) # columns (response)
+  rownames(t)<-colnames(t) # rows (predictor)
+
+  for (k in rownames(t)) {
+    for (i in colnames(t)) {
+      
+      if (i %in% v$coefficients$Predictor[v$coefficients$Response==k]){
+      t[i,k]<-v$coefficients$Std.Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k]
+      }}}
+  
+  t[sampltemp,"tempy"]<-v$coefficients$Std.Estimate[v$coefficients$Predictor==paste0("~~",sampltemp) & v$coefficients$Response=="~~tempy"]
+  t["tempy",sampltemp]<-t[sampltemp,"tempy"]
+  
+  return(t)
+}
+
+tpollab<-estimates2(pollabsm, "samplpoll", "clpolldip", "clpollab", "flrich")
+
+#### Variable positions ####
+
+# this matrix lists where in a 3x4 matrix the column names from table t should be placed
+l2<-matrix(c(rep(0,24)),8,3)
+
+l2[1,1]=1
+l2[3,1]=2
+l2[5,1]=3
+l2[7,1]=4
+l2[5,3]=5
+l2[1,3]=6
+l2[2,2]=7
+
+#### Arrow labels ####
+
+# order according to number of response variable (that's why first k, then i)
+
+edgelabels2<-function(v, sampltemp, div, ab) {
+  n<-3; sl<-c(NA, NA)
+
+  for (k in c(sampltemp,"tempy","pp","manbin","pldiv","flrich",div,ab)) { # columns (response)
+    for (i in c(sampltemp,"tempy","pp","manbin","pldiv","flrich",div,ab)) { # rows (predictor)
+      if (i %in% v$coefficients$Predictor[v$coefficients$Response==k]) {
+        sl[n]<-paste(round(v$coefficients$Std.Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k], 2),psign(v$coefficients$P.Value[v$coefficients$Predictor==i & v$coefficients$Response==k]))
+        n<-n+1
+      }}}
+  return(sl)
+}
+
+elpollab<-edgelabels2(pollabsm, "samplpoll", "clpolldip", "clpollab")
+
+#### Arrow colors ####
+
+edgecolors2<-function(v, sampltemp, div, ab) {
+  n<-3; sl<-c("black", "black")
+  
+for (k in c(sampltemp,"tempy","pp","manbin","pldiv","flrich",div,ab)) { # columns (response)
+    for (i in c(sampltemp,"tempy","pp","manbin","pldiv","flrich",div,ab)) { # rows (predictor)
+      if (i %in% v$coefficients$Predictor[v$coefficients$Response==k]) {
+        if (v$coefficients$Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k]>0){
+          sl[n]<-pcolpos(v$coefficients$P.Value[v$coefficients$Predictor==i & v$coefficients$Response==k])
+        } else if (v$coefficients$Estimate[v$coefficients$Predictor==i & v$coefficients$Response==k]<0){
+          sl[n]<-pcolneg(v$coefficients$P.Value[v$coefficients$Predictor==i & v$coefficients$Response==k])
+        }
+        
+        n<-n+1
+      }}}
+  return(sl)
+}
+
+ecpollab<-edgecolors2(pollabsm, "samplpoll", "clpolldip", "clpollab")
+
+#### plot ####
+
+plotpaths2<-function(div, ab, plrich, sampltemp, edgevaluematrix, edgecolor, edgelabel, pathmodel, letter) {
+  
+  svg(here::here(figures_dir, "sems-single", paste0(div, "absm.svg")), height=3.54, width=3.15)
+  
+  plot(qgraph(edgevaluematrix, shape="square", layout=l2, labels=F, vsize=18, esize=8, edge.color=edgecolor, colFactor=0, asize=6, edge.labels=edgelabel, edge.label.bg=c(NA, NA, rep("white", length(edgelabel)-2)), edge.label.cex=1.8, edge.label.margin=0.025, edge.label.position=0.65, mar=c(3,4,3,3), images=c(
+    here::here(figures_dir, "logos", paste0(sampltemp, ".png")),
+    here::here(figures_dir, "logos", "tempy.png"),
+    here::here(figures_dir, "logos", "pp.png"),
+    here::here(figures_dir, "logos", "manbin.png"),
+    here::here(figures_dir, "logos", paste0(plrich, ".png")),
+    here::here(figures_dir, "logos", paste0(div, ".png")),
+    here::here(figures_dir, "logos", paste0(ab, ".png"))), 
+    borders = F # no border lines around logos
+        ) %>% inset2("Edgelist", (.) %>% extract2("Edgelist") %>% inset2("bidirectional", c(TRUE,TRUE, rep(FALSE,length(edgelabel)-2))))); # correct temperature to double arrow
+  text(1,1.25,paste("R²=",pathmodel$R2$R.squared[pathmodel$R2$Response==div]),cex=.8
+        );text(1,-0.65,paste("R²=",pathmodel$R2$R.squared[pathmodel$R2$Response==plrich]),cex=.8
+        );text(0,.97,paste("R²=",pathmodel$R2$R.squared[pathmodel$R2$Response==ab]),cex=.8
+        );text(-1.25,1.1,letter,cex=1.3
+        );text(0.4,-1.1,paste("Fisher's C =", pathmodel$Cstat$Fisher.C, "\np-value = ", pathmodel$Cstat$P.Value), adj=0, cex=.7)
+  
+  dev.off()
+}
+
+plotpaths2("clpolldip", "clpollab", "flrich", "sampldip", tpollab, ecpollab, elpollab, pollabsm, "c)") # exported as svg to manually adjust arrow labels & save it as png
+
+pathpollab<-readPNG(here::here(figures_dir, "sems-single", "clpolldipabsm.png")) # read manually adjusted and saved png file
+```
+
+#### legend
+
+```{r polllegend}
+tlegend<-matrix(c(rep(0,16*16)),16,16,byrow=T)
+colnames(tlegend)<-c("tempsampl", "sampling temperature malaise", "tempy", "annual temperature", "pp", "primary productivity", "manbin", "management", "polldiv", "sampldip", "sampling temperature transects", "pollinator richness", "clpollab", "pollinator abundance", "flrich", "flower richness") # Spalten (response)
+rownames(tlegend)<-colnames(tlegend)
+
+ll<-matrix(c(rep(0,16)),4,4)
+
+ll[1,1]=1; ll[1,2]=2
+ll[2,1]=3; ll[2,2]=4
+ll[3,1]=5; ll[3,2]=6
+ll[4,1]=7; ll[4,2]=8
+ll[1,3]=9; ll[1,4]=10
+ll[2,3]=11; ll[2,4]=12
+ll[3,3]=13; ll[3,4]=14
+ll[4,3]=15; ll[4,4]=16
+
+png(here::here(figures_dir, "sems-single", "legendpoll.png"), height=9, width=8, res=600, units = "cm")
+  
+qgraph(tlegend, shape="square", layout=ll, labels=F, vsize=18, images=c(
+  here::here(figures_dir, "logos", "tempsampl.png"), NA,
+  here::here(figures_dir, "logos", "tempy.png"), NA,
+  here::here(figures_dir, "logos", "pp.png"), NA,
+  here::here(figures_dir, "logos", "manbin.png"), NA,
+  here::here(figures_dir, "logos", "sampldip.png"), NA, 
+  here::here(figures_dir, "logos", "polldiv.png"), NA, 
+  here::here(figures_dir, "logos", "clpollab.png"), NA, 
+  here::here(figures_dir, "logos", "flrich.png"), NA),
+  borders = F # no border lines around logos
+    );text(-0.7,1,"sampling\ntemperature\nmalaise trap",cex=.9, adj = 0
+    );text(-0.7,0.35,"annual\ntemperature",cex=.9, adj = 0
+    );text(-0.7,-0.35,"primary\nproductivity",cex=.9, adj = 0
+    );text(-0.7,-1,"management",cex=.9, adj = 0
+    );text(0.63,1,"sampling\ntemperature\ntransects",cex=.9, adj = 0
+    );text(0.63,0.35,"pollinator\nrichness",cex=.9, adj = 0
+    );text(0.63,-0.35,"pollinator\nabundance",cex=.9, adj = 0
+    );text(0.63,-1,"flower\nrichness",cex=.9, adj = 0)
+     
+dev.off()
+
+pathlegendpoll<-readPNG(here::here(figures_dir, "sems-single", "legendpoll.png"))
+```
+
+#### assemble plots
+
+```{r pollsemplot, fig.cap="", echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.width=16, fig.height=11}
+png(here::here(figures_dir, "sempoll.png"), height=11, width=10, res=600, units = "cm")
+
+grid.arrange(rasterGrob(pathpollmal), rasterGrob(pathlegendpoll), rasterGrob(pathpolldip), rasterGrob(pathpollab), ncol=2)
+
+dev.off()
+```
+
+### 4. grasshoppers
+#### malaise traps & transect walks
+
+```{r orpathmodels}
+# malaise traps
+ormalsm<-summary(psem(pp~1,
+                      lm(pldiv~manbin+pp+tempy, pd),
+                      lm(divor~manbin+pp+tempy, pd),
+                      tempy %~~% tempsampl),
+                 .progressBar = F)
+
+# transect walks
+ordipsm<-summary(psem(pp~1,
+                      lm(pldiv~manbin+pp+tempy, pd),
+                      lm(ordip~tempy, pd),
+                      tempy %~~% samplor),
+                 .progressBar = F)
+
+# Estimates
+tmalor<-estimates(ormalsm, "tempsampl", "divor", "pldiv")
+tdipor<-estimates(ordipsm, "samplor", "ordip", "pldiv")
+
+# Edge labels
+elmalor<-edgelabels(ormalsm, "tempsampl", "divor")
+eldipor<-edgelabels(ordipsm, "samplor", "ordip")
+
+# Edge colors
+ecmalor<-edgecolors(ormalsm, "tempsampl", "divor")
+ecdipor<-edgecolors(ordipsm, "samplor", "ordip")
+
+# plot
+plotpaths("divor", "pldiv", "tempsampl", "malaisetrap", tmalor, ecmalor, elmalor, ormalsm, "a)")
+plotpaths("ordip", "pldiv", "sampldip", "kescher", tdipor, ecdipor, eldipor, ordipsm, "b)")
+
+ormal<-readPNG(here::here(figures_dir, "sems-single", "divorsm.png"))
+ordip<-readPNG(here::here(figures_dir, "sems-single", "ordipsm.png"))
+```
+
+#### legend
+
+```{r polllegend}
+# legend
+tlegend2<-matrix(c(rep(0,14*14)),14,14,byrow=T)
+colnames(tlegend2)<-c("tempsampl", "sampling temperature malaise", "tempy", "annual temperature", "pp", "primary productivity", "manbin", "management", "sampldip", "sampling temperature transects", "divor", "grasshopper richness", "pldiv", "plant richness") # columns(response)
+rownames(tlegend2)<-colnames(tlegend2)
+
+ll2<-matrix(c(rep(0,16)),4,4)
+
+ll2[1,1]=1; ll2[1,2]=2
+ll2[2,1]=3; ll2[2,2]=4
+ll2[3,1]=5; ll2[3,2]=6
+ll2[4,1]=7; ll2[4,2]=8
+ll2[1,3]=9; ll2[1,4]=10
+ll2[2,3]=11; ll2[2,4]=12
+ll2[3,3]=13; ll2[3,4]=14
+ll2[4,3]=15; ll2[4,4]=16
+
+png(here::here(figures_dir, "sems-single", "legendor.png"), height=9, width=8, res=600, units = "cm")
+  
+qgraph(tlegend2, shape="square", layout=ll2, labels=F, vsize=18, images=c(
+  here::here(figures_dir, "logos", "tempsampl.png"), NA,
+  here::here(figures_dir, "logos", "tempy.png"), NA,
+  here::here(figures_dir, "logos", "pp.png"), NA,
+  here::here(figures_dir, "logos", "manbin.png"), NA,
+  here::here(figures_dir, "logos", "sampldip.png"), NA, 
+  here::here(figures_dir, "logos", "divor.png"), NA, 
+  here::here(figures_dir, "logos", "pldiv.png"), NA),
+  borders = F # no border lines around logos
+    );text(-0.7,1,"sampling\ntemperature\nmalaise trap",cex=.9, adj = 0
+    );text(-0.7,0.35,"annual\ntemperature",cex=.9, adj = 0
+    );text(-0.7,-0.35,"primary\nproductivity",cex=.9, adj = 0
+    );text(-0.7,-1,"management",cex=.9, adj = 0
+    );text(0.63,1,"sampling\ntemperature\ntransects",cex=.9, adj = 0
+    );text(0.63,0.35,"grass-\nhopper\nrichness",cex=.9, adj = 0
+    );text(0.63,-0.35,"plant\nrichness",cex=.9, adj = 0)
+     
+dev.off()
+
+pathlegendor<-readPNG(here::here(figures_dir, "sems-single", "legendor.png"))
+```
+
+#### assemble plots
+
+```{r methsemplot, fig.cap="", echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.width=16, fig.height=11}
+png(here::here("text", "figures", "orthmeth.png"), height=16.5, width=5, res=600, units = "cm")
+
+grid.arrange(rasterGrob(ormal), rasterGrob(ordip), rasterGrob(pathlegendor), ncol=1)
+
+dev.off()
+```
+
+# Supplementary Material
+
+## S2. comparison species richness of all & selected pollinators
+
+```{r pollpatterns}
+pollnames<-c(`polldiv` = "all", `clpolldiv` = "selected")
+
+pollplot<-function(dataframe) {
+  dataframe %>% pivot_longer(cols=c(polldiv, clpolldiv),names_to = c("eco.group"),values_to="spec.no") %>%
+  ggplot(aes(elev, spec.no, col=eco.group, fill=eco.group)) +
+  facet_wrap(vars(fct_inorder(eco.group)),ncol = 2, scales = "free", labeller = as_labeller(pollnames)) +
+  geom_point(size=1.5, alpha=0.4, shape=16) +
+  geom_smooth(method="gam", formula = y ~ s(x, k=4), se = T, lwd = 1, alpha=0.4) +
+  theme_classic() +
+  theme(axis.text = element_text(size=9),
+        axis.title = element_text(size=10),
+        legend.title = element_blank(),
+        legend.position = "none",
+        strip.text = element_text(size=10), # modify facet label text
+        strip.background = element_blank()) + # remove frame from facet labels
+  labs(x="elevation [m a.s.l.]") +
+  scale_fill_manual(
+    values = c("polldiv"="#C73965", "clpolldiv"="#FFB601"),
+    labels = c("polldiv"="all pollinators", "clpolldiv"="monitored pollinators"), name="richness") +
+  scale_color_manual(
+    values = c("polldiv"="#C73965", "clpolldiv"="#FFB601"),
+    labels = c("polldiv"="all pollinators", "clpolldiv"="monitored pollinators"), name="richness") +
+    ylab("species richness")
+}
+
+pollcorval<-cor.test(pd$polldiv, pd$clpolldiv, method="pearson")
+
+pollcor<-ggplot(aes(polldiv, clpolldiv), data=pd) +
+  geom_point(pch=16, alpha=0.5, col="#F79646") +
+  geom_smooth(formula = y ~ x, se=F, method="lm", col="#F79646") +
+  theme_classic() +
+  # ylim(0,17) +
+  annotate("text", label = paste("cor =", round(pollcorval$estimate, 2)),
+    x = 170, y = 60) +
+  labs(x="all pollinators", y="selected pollinators")
+
+
+png(here::here(suppl_dir, "pollcorr.png"), height=13.5, width=9, res=600, units = "cm")
+
+pollplot(pd) / pollcor + plot_layout(heights = c(1,1.8))
+
+dev.off()
+```
+
+## S3. correlation elevation with annual & sampling temperatures
+
+```{r pldivelevcor}
+tempcheck<-pivot_longer(data=pd, cols=c(tempy, tempsampl, samplpoll),names_to = c("group"),values_to="temp") %>%
+  ggplot(aes(elev, temp)) +
+  facet_wrap(vars(group),ncol = 1, scales = "free", labeller = as_labeller(c("tempy" = "annual", "samplpoll"="transect walks", "tempsampl"="malaise traps"))) +
+  geom_point(pch=16, alpha=0.5, col="coral2") +
+  theme_classic() +
+  labs(x="elevation [m a.s.l.]", y="temperature [°C]")
+
+png(here::here(suppl_dir, "temppatterns.png"), height=15, width=6, res=600, units = "cm")
+
+tempcheck
+
+dev.off()
+```
+
+## S4. pollinator path model hypothesized causal structure
+
+```{r basepoll}
+# basic model
+tbase<-matrix(c(rep(0,6*6)),6,6,byrow=T)
+colnames(tbase)<-c("tempsampl","tempy","pp","manbin","pldiv","div") # columns (response)
+rownames(tbase)<-colnames(tbase)
+tbase["tempy","tempsampl"]=0.1
+tbase["tempsampl","tempy"]=0.1
+tbase["tempsampl","pp"]=0.1
+tbase["tempy","pp"]=0.1
+tbase["tempy","pldiv"]=0.1
+tbase["pp","pldiv"]=0.1
+tbase["manbin","pldiv"]=0.1
+tbase["tempsampl","div"]=0.1
+tbase["tempy","div"]=0.1
+tbase["pp","div"]=0.1
+tbase["manbin","div"]=0.1
+tbase["pldiv","div"]=0.1
+
+png(here::here(figures_dir, "sems-single", "basesmmeth.png"), height=9, width=8, res=600, units = "cm")
+
+plot(qgraph(tbase, shape="square", layout=l, labels=F, vsize=18, edge.color="black", asize=6, edge.labels=F, curveAll=T, curve=c(rep(0,2),-2.5,rep(0,9)), mar=c(3,4,3,3), images=c( # curve=how bend the curve will be, curveAll to not just bend when there are several arrows on a variable
+    here::here(figures_dir, "logos", "tempsampl.png"),
+    here::here(figures_dir, "logos", "tempy.png"),
+    here::here(figures_dir, "logos", "pp.png"),
+    here::here(figures_dir, "logos", "manbin.png"),
+    here::here(figures_dir, "logos", "flrich.png"),
+    here::here(figures_dir, "logos", "polldiv.png")), 
+    borders = F # no border lines around logos
+      ) %>% inset2("Edgelist", (.) %>% extract2("Edgelist") %>% inset2("bidirectional", c(TRUE,TRUE, rep(FALSE,10))))); text(-1.25,1.1,"",cex=1.3)
+
+dev.off()
+
+pathbasemeth<-readPNG(here::here(figures_dir, "sems-single", "basesmmeth.png"))
+```
+
+```{r polllegend}
+# legend
+tlegend3<-matrix(c(rep(0,16*16)),16,16,byrow=T)
+colnames(tlegend3)<-c("tempsampl", "sampling temperature malaise", "tempy", "annual temperature", "pp", "primary productivity", "manbin", "management", "polldiv", "pollinator richness", "flrich", "flower richness", NA, NA, NA, NA) # columns (response)
+rownames(tlegend3)<-colnames(tlegend3)
+
+ll3<-matrix(c(rep(0,16)),4,4)
+
+ll3[1,1]=1; ll3[1,2]=2
+ll3[2,1]=3; ll3[2,2]=4
+ll3[3,1]=5; ll3[3,2]=6
+ll3[4,1]=7; ll3[4,2]=8
+ll3[1,3]=9; ll3[1,4]=10
+ll3[2,3]=11; ll3[2,4]=12
+ll3[3,3]=13; ll3[3,4]=14
+ll3[4,3]=15; ll3[4,4]=16
+
+png(here::here(figures_dir, "sems-single", "legendbasepoll.png"), height=9, width=8, res=600, units = "cm")
+  
+qgraph(tlegend3, shape="square", layout=ll3, labels=F, vsize=18, images=c(
+  here::here(figures_dir, "logos", "tempsampl.png"), NA,
+  here::here(figures_dir, "logos", "tempy.png"), NA,
+  here::here(figures_dir, "logos", "pp.png"), NA,
+  here::here(figures_dir, "logos", "manbin.png"), NA,
+  here::here(figures_dir, "logos", "polldiv.png"), NA, 
+  here::here(figures_dir, "logos", "flrich.png"), NA, NA, NA, NA, NA),
+  borders = F # no border lines around logos
+    );text(-0.7,1,"sampling\ntemperature",cex=.9, adj = 0
+    );text(-0.7,0.35,"annual\ntemperature",cex=.9, adj = 0
+    );text(-0.7,-0.35,"primary\nproductivity",cex=.9, adj = 0
+    );text(-0.7,-1,"management",cex=.9, adj = 0
+    );text(0.63,1,"pollinator\nrichness",cex=.9, adj = 0
+    );text(0.63,0.35,"flower\nrichness",cex=.9, adj = 0
+    )
+     
+dev.off()
+
+pathlegendbasepoll<-readPNG(here::here(figures_dir, "sems-single", "legendbasepoll.png"))
+```
+
+```{r pollbaseplot}
+png(here::here(suppl_dir, "basesempoll.png"), height=5.5, width=10, res=600, units = "cm")
+
+grid.arrange(rasterGrob(pathbasemeth), rasterGrob(pathlegendbasepoll), ncol=2)
+
+dev.off()
+```
+
+## S5. Venn diagrams individual species groups
+
+```{r venndiagram}
+# function see 1. Venn diagrams - grasshoppers
+venny("Diptera", "malaise traps", "transect walks", 200, 160, 0, 60, -0.2, 0, 0.055, 1.1)
+venny("Hymenoptera", "malaise traps", "transect walks", 20, 340, 180, 60, -0.2, 0, 0.055, 1.1)
+venny("Lepidoptera", "malaise traps", "transect walks", 20, 340, 180, 355, -0.03, 0.75, 0.055, 1.1)
+
+vendip<-readPNG(here::here(figures_dir, "venns-single", "venndiagDiptera.png"))
+venhym<-readPNG(here::here(figures_dir, "venns-single", "venndiagHymenoptera.png"))
+venlep<-readPNG(here::here(figures_dir, "venns-single", "venndiagLepidoptera.png"))
+
+png(here::here("text", "supplementary", "vennspec.png"), height=3.5, width=10.5, res=600, units = "cm")
+
+grid.arrange(rasterGrob(vendip), rasterGrob(venhym), rasterGrob(venlep), nrow=1);grid.raster(
+  readPNG(here::here(figures_dir, "logos", "hvdip.png")), width = .055, x=.035, y=.91);grid.raster(
+  readPNG(here::here(figures_dir, "logos", "wbdip.png")), width = .055, x=.365, y=.91);grid.raster(
+  readPNG(here::here(figures_dir, "logos", "bfdip.png")), width = .06, x=.695, y=.91)
+
+dev.off()
+```
+
+## S6. body size comparisons
+
+```{r body sizes}
+MT<-read.csv(here::here(data_proc, "body_sizes.csv"), row.names = 1)
+
+library(ggtext) # including images for x axis labels
+
+# define images as labels (html code included)
+
+imgpaths<-c(here::here(figures_dir, "logos", "divwb.png"), here::here(figures_dir, "logos", "divhv.png"),
+            here::here(figures_dir, "logos", "divbf.png"), here::here(figures_dir, "logos", "divor.png"))
+
+labels <- c()
+
+for (i in 1:length(levels(MT$group))){
+  
+  img.name <- levels(MT$group)[i]
+  
+  labels <- c(labels, paste0("<img src='", imgpaths[i],  "' width='25' /><br>*", img.name,"*"))
+  
+}
+
+png(here::here("text", "supplementary", "body_sizes_methods.png"), height=9, width=13.5, res=600, units = "cm")
+
+ggplot(MT, aes(col=method1, fill=method1, y=bodysize, x=group, alpha=method1)) + 
+  geom_boxplot(outlier.shape=16, outlier.size=2, notch=FALSE) +
+  theme_classic() +
+  scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
+                    name=element_blank()) +
+  scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
+                    name=element_blank()) +
+  scale_alpha_manual(values = c("malaise traps"=.5, "transect walks"=.5), name=element_blank()) +
+  labs(x=element_blank(), y="body size [mm]") +
+  scale_x_discrete(name = NULL, labels = labels) + # use images for axis labels
+  theme(axis.text.x = element_markdown(), # add text to image labels
+    legend.position=c(.14, .93))
+
+dev.off()
+```
+
+## S7. beta diversity
+
+```{r beta}
+
+png(here::here("text", "supplementary", "betadiversity.png"), height=8, width=11, res=600, units = "cm")
+
+pd %>% pivot_longer(cols=c(betadivj, betadipj),names_to = c("method"),values_to="beta") %>%
+  ggplot(aes(elev, beta, col=method, fill=method)) +
+  geom_point(size=1.5, alpha=0.6, shape=16) +
+  geom_smooth(aes(linetype=method), method="gam", formula = y ~ s(x, k=4), se = T, lwd = .8) +
+  theme_classic() +
+  labs(x="elevation [m a.s.l.]", y="beta diversity") +
+  theme(legend.position=c(.86, .93)) +
+  scale_color_manual(values = c("betadivj"="#21908dff", "betadipj"="#440154ff"),
+         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
+         name=element_blank()) +
+  scale_fill_manual(values = c("betadivj"="#21908dff", "betadipj"="#440154ff"),
+         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
+         name=element_blank()) +
+  scale_linetype_manual(values = c("betadivj"="solid", "betadipj"="dotdash"),
+         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
+         name=element_blank())
+
+dev.off()
+```
+
+## S8 & S9. Elevational & sampling temperature patterns for individual pollinator groups
+
+```{r methspecgroupmodelline}
+# read analysis
+rmarkdown::render(here::here("results", "scripts", "Models.Rmd"), quiet = T) # quiet to not get text from rendering
+
+# Labels
+elevtags<-data.frame(lab=c(paste(psign(elevhv$p.pv["method.L"]),"/",psign(elevhv$s.table[2,4])),
+                           paste(psign(elevwb$p.pv["method.L"]),"/",psign(elevwb$s.table[2,4])),
+                           paste(psign(elevbf$p.pv["method.L"]),"/",psign(elevbf$s.table[2,4]))),
+                     group=c("hoverflies","wild bees", "butterflies"))
+
+temptags<-data.frame(lab=c(paste(psign(temphv$p.pv["method.L"]),"/",psign(temphv$s.table[2,4])),
+                           paste(psign(tempwb$p.pv["method.L"]),"/",psign(tempwb$s.table[2,4])),
+                           paste(psign(tempbf$p.pv["method.L"]),"/",psign(tempbf$s.table[2,4]))),
+                     group=c("hoverflies","wild bees", "butterflies"))
+
+elevr2<-data.frame(lab=c(paste("R² ≈", round(elevhv$r.sq, 2)),
+                         paste("R² ≈", round(elevwb$r.sq, 2)),
+                         paste("R² ≈", round(elevbf$r.sq, 2))),
+                   group=c("hoverflies","wild bees", "butterflies"))
+
+tempr2<-data.frame(lab=c(paste("R² ≈", round(temphv$r.sq, 2)),
+                         paste("R² ≈", round(tempwb$r.sq, 2)),
+                         paste("R² ≈", round(tempbf$r.sq, 2))),
+                   group=c("hoverflies","wild bees", "butterflies"))
+
+# syrphids
+elevhv<-gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=sm[sm$group=="hoverflies",], family=poisson, method="REML")
+
+elevhv<-get_gam_predictions(elevhv, elev, series_length = 10*(max(sm$elev)-min(sm$elev))+1)
+elevhv$group<-"hoverflies"
+
+temphv<-gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=sm[sm$group=="hoverflies",], family=poisson, method="REML")
+
+temphv<-get_gam_predictions(temphv, tempright, series_length = 100*(max(sm$tempright)-min(sm$tempright))+1)
+temphv$group<-"hoverflies"
+
+# wild bees
+elevwb<-gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=sm[sm$group=="wild bees",], family=poisson, method="REML")
+
+elevwb<-get_gam_predictions(elevwb, elev, series_length = 10*(max(sm$elev)-min(sm$elev))+1)
+elevwb$group<-"wild bees"
+
+tempwb<-gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=sm[sm$group=="wild bees",], family=poisson, method="REML")
+
+tempwb<-get_gam_predictions(tempwb, tempright, series_length = 100*(max(sm$tempright)-min(sm$tempright))+1)
+tempwb$group<-"wild bees"
+
+# butterflies
+elevbf<-gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=sm[sm$group=="butterflies",], family=poisson, method="REML")
+
+elevbf<-get_gam_predictions(elevbf, elev, series_length = 10*(max(sm$elev)-min(sm$elev))+1)
+elevbf$group<-"butterflies"
+
+tempbf<-gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=sm[sm$group=="butterflies",], family=poisson, method="REML")
+
+tempbf<-get_gam_predictions(tempbf, tempright, series_length = 100*(max(sm$tempright)-min(sm$tempright))+1)
+tempbf$group<-"butterflies"
+
+# elev all
+allelev<-rbind(elevhv, elevwb, elevbf)
+
+for (i in c("spec.no","SE","CI_upper","CI_lower")){ # backtransform poisson (log)
+  allelev[i]<-exp(allelev[i])
+}
+
+# temp all
+alltemp<-rbind(temphv[temphv$method=="malaise traps" &
+                             temphv$tempright>=min(sm$tempsampl) &
+                             temphv$tempright<=max(sm$tempsampl),],
+               temphv[temphv$method=="transect walks" &
+                             temphv$tempright>=min(sm$samplhv) &
+                             temphv$tempright<=max(sm$samplhv),],
+               tempwb[tempwb$method=="malaise traps" &
+                             tempwb$tempright>=min(sm$tempsampl) &
+                             tempwb$tempright<=max(sm$tempsampl),],
+               tempwb[tempwb$method=="transect walks" &
+                             tempwb$tempright>=min(sm$samplwb) &
+                             tempwb$tempright<=max(sm$samplwb),],
+               tempbf[tempbf$method=="malaise traps" &
+                             tempbf$tempright>=min(sm$tempsampl) &
+                             tempbf$tempright<=max(sm$tempsampl),],
+               tempbf[tempbf$method=="transect walks" &
+                             tempbf$tempright>=min(sm$samplbf) &
+                             tempbf$tempright<=max(sm$samplbf),])
+
+for (i in c("spec.no","SE","CI_upper","CI_lower")){ # backtransform poisson (log)
+  alltemp[i]<-exp(alltemp[i])
+}
+
+# plot
+methspecplot<-function (var, xaxisname, xcoord, ycoord, tags, tagpos.x, tagpos.y, xcorrect, ycorrect, dataframe, r2, rpos.x, rpos.y, rxcorrect, rycorrect) {
+  g <- ggplot_gtable(ggplot_build(
+    ggplot(aes({{var}}, spec.no, col=method), data=dataframe) +
+    facet_wrap(vars(fct_inorder(group)), ncol = 1, scales = "free") +
+    geom_ribbon(aes(ymin = CI_lower, ymax = CI_upper, fill=method), alpha=.4, colour = NA) +
+    geom_point(pch=16, alpha=0.6, data=sm) +
+    geom_line(aes(linetype=method, col=method), lwd=0.7) +
+    theme_classic() +
+    theme(axis.text = element_text(size=10),
+          axis.title = element_text(size=10),
+          strip.text = element_blank(), # suppress plot labelling by facetwrap
+          legend.position = "none") +
+    labs(x=xaxisname, y="species richness") +
+    scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
+    name="sampling\nmethod") +
+    scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),name="sampling\nmethod") +
+    scale_linetype_manual(values = c("malaise traps"="solid", "transect walks"="dotdash"),
+      name="sampling\nmethod") +
+    scale_x_continuous(n.breaks=4) +
+    coord_cartesian(ylim = c(0, NA)) + # set lower limit to 0 without stopping to plot se
+    geom_text(inherit.aes = FALSE, data=tags, aes(x=tagpos.x, y=tagpos.y, label=lab), col="black", hjust=xcorrect, vjust=ycorrect, size=3.5) +
+    geom_text(inherit.aes = FALSE, data=r2, aes(x=rpos.x, y=rpos.y, label=lab), col="black", hjust=rxcorrect, vjust=rycorrect, size=3.5)
+  ))
+
+  # add logos
+  
+  facets <- grep("panel", g$layout$name)
+  
+  logos <- list(rasterGrob(readPNG(here::here(figures_dir, "logos", "hvdip.png")),
+                             width=.15, x = xcoord, y = ycoord),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "wbdip.png")),
+                             width=.15, x = xcoord, y = ycoord),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "bfdip.png")),
+                             width=.15, x = xcoord, y = .9))
+  
+  g2 <- with(g$layout[facets,],
+          gtable::gtable_add_grob(g, logos,
+                          t=t, l=l, b=b, r=r))
+  
+  plot(g2)
+  }
+
+# elevation
+png(here::here("text", "supplementary", "elevpatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
+
+methspecplot(elev, "elevation [m a.s.l.]", .9, .88, elevtags, 1800, Inf, 1, 1.1, allelev, elevr2, -Inf, -Inf, -.15, -.8)
+
+dev.off()
+
+# sampling temperature
+png(here::here("text", "supplementary", "temppatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
+
+methspecplot(tempright, "sampling temperature [°C]", .1, .88, temptags, -Inf, Inf, -1, 1.2, alltemp, tempr2, Inf, -Inf, 1.1, -.8)
+
+dev.off()
+```
