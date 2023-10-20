@@ -12,16 +12,16 @@ _Janika M. Kerner <a href="https://orcid.org/0000-0002-2355-081X"><img src="http
 
 ## Content of the repository
 
-1. __data__:
+1. `data`:
     * data of pollinator (wild bees, hoverflies, butterflies) and grasshopper monitoring in 2019 from malaise traps and transect walks, matched with environmental variables like e.g., temperature and plant richness (plotdata.csv)
     * body size data for wild bees, hoverflies, butterflies and grasshoppers (body_sizes.csv)
     * species lists from malaise traps (speclistmal.csv) and transect walks (speclistdip.csv)
     * dependent metadata files (.csv) in subfolder 
     
-2. __scripts__:
+2. `scripts`:
     * Markdown documents used to code the data analysis (Models.Rmd) and figures (Figures.Rmd)
 
-3. __text__:  
+3. `text`:  
     * `figures`: figures from the main text are saved here when running the Markdown script
     * `supplementary`: figures from the supplement are saved here when running the Markdown script
     
