@@ -22,8 +22,8 @@ _Janika M. Kerner <a href="https://orcid.org/0000-0002-2355-081X"><img src="http
     * Markdown documents used to code the data analysis (Models.Rmd) and figures (Figures.Rmd)
 
 3. __text__:  
-    * __figures__ figures from the main text are saved here when running the Markdown script
-    * __supplementary__ figures from the supplement are saved here when running the Markdown script
+    * 'figures': figures from the main text are saved here when running the Markdown script
+    * 'supplementary': figures from the supplement are saved here when running the Markdown script
     
 ***
 
