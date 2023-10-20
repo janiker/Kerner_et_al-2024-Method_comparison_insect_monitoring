@@ -1,0 +1,47 @@
+﻿VARIABLE;EXPLANATION
+plot;plot-ID
+elev;elevation of the plot [m.a.s.l.]
+manbin;management as binary variable: extensively used (1) or unused (0)
+polldiv;species richness from malaise traps filtered for pollinators as classified in Table S1 (Supplementary Material)
+divwb;wild bee species richness from malaise traps
+divbf;butterfly species richness from malaise traps
+divhv;hoverfly species richness from malaise traps
+divor;grasshopper species richness from malaise traps
+wbdip;wild bee species richness from transect walks
+wbab;wild bee abundance from transect walks
+bfdip;butterfly species richness from transec walks
+bfab;butterfly abundance from transect walks
+hvdip;hoverfly species richness from transect walks
+hvab;hoverfly abundance from transect walks
+ordip;grasshopper species richness from transect walks
+orab;grasshopper abundance from transect walks
+clpolldiv;species richness from malaise traps filtered for pollinator families that were also monitored by transect walks: hoverflies, wild bees, butterflies
+clpolldip;pollinator species richness from transect walks (hoverflies, wild bees, butterflies)
+clpollab;pollinator abundance from transect walks (hoverflies, wild bees, butterflies)
+betadivj;pollinator beta diversity from malaise traps defined by Jaddard's dissimilarity index
+betadipj;pollinator beta diversity from transect walks defined by Jaddard's dissimilarity index
+pldiv;plant richness
+pp;primary productivity: plant biomass [g] per 0.25 m² in exclosures (grazing effect excluded)
+plbm;plant biomass [g] per 0.25 m² outside of exclosures (grazing effect included)
+deadwood;average deadwood cover [%] in 60x60 m plot during transect walks
+flcov;average flower cover [%] in plot during transect walks
+herb_cov;average herb cover [%] in plot during transect walks
+herb_height;average herb height [cm] in plot duringtransect walks
+shrub_cov;average shrub cover [%] in plot during transect walks
+shrub_height;average shrub height [cm] in plot during transect walks
+tree_cov;average tree cover [%] in plot during transect walks
+tree_height;average tree height [cm] in plot during transect walks
+flrich;average richness of flowering plants in plot during transect walks
+temps;average temperature [°C] of summer months (May - September)
+tempy;annual temperature [°C]
+tempsampl;average temperature [°C] malaise trap sampling days
+tempwb;average temperature [°C] transect walk sampling days for wild bees
+tempbf;average temperature [°C] transect walk sampling days for butterflies
+temphv;average temperature [°C] transect walk sampling days for hoverflies
+tempor;average temperature [°C] transect walk sampling days for grasshoppers
+temppoll;average temperature [°C] transect walk sampling days for pollinators (average of wild bees, hoverflies, butterflies)
+samplwb;average temperature [°C] transect walk sampling hours for wild bees
+samplbf;average temperature [°C] transect walk sampling hours for butterflies
+samplhv;average temperature [°C] transect walk sampling hours for hoverflies
+samplor;average temperature [°C] transect walk sampling hours for grasshoppers
+samplpoll;average temperature [°C] transect walk sampling hours for pollinators (average wild bees, hoverflies, butterflies)

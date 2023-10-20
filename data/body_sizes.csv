@@ -1,0 +1,586 @@
+species;bodysize;group;method
+Andrena carantonica;13;wild bees;malaise traps
+Andrena chrysosceles;9.5;wild bees;malaise traps
+Andrena fucata;11.5;wild bees;malaise traps
+Andrena intermedia;11.5;wild bees;malaise traps
+Andrena minutula;6;wild bees;malaise traps
+Andrena subopaca;7;wild bees;malaise traps
+Andrena wilkella;11.5;wild bees;malaise traps
+Anthidiellum strigatum;6.5;wild bees;malaise traps
+Anthophora furcata;11.5;wild bees;malaise traps
+Bombus campestris;16.5;wild bees;malaise traps
+Bombus gerstaeckeri;16;wild bees;malaise traps
+Bombus hortorum;13.5;wild bees;malaise traps
+Bombus lapidarius;14;wild bees;malaise traps
+Bombus monticola;12.5;wild bees;malaise traps
+Bombus mucidus;14;wild bees;malaise traps
+Bombus pratorum;11.5;wild bees;malaise traps
+Bombus pyrenaeus;10.5;wild bees;malaise traps
+Bombus soroeensis;12;wild bees;malaise traps
+Bombus sylvestris;15;wild bees;malaise traps
+Bombus wurflenii;14.5;wild bees;malaise traps
+Dufourea alpina;6;wild bees;malaise traps
+Halictus confusus;7;wild bees;malaise traps
+Halictus rubicundus;10.5;wild bees;malaise traps
+Halictus tumulorum;7;wild bees;malaise traps
+Hoplitis mitis;8;wild bees;malaise traps
+Hylaeus sinuatus;5.5;wild bees;malaise traps
+Lasioglossum albipes;8;wild bees;malaise traps
+Lasioglossum alpigenum;NA;wild bees;malaise traps
+Lasioglossum calceatum;8.5;wild bees;malaise traps
+Lasioglossum cupromicans;5.5;wild bees;malaise traps
+Lasioglossum fulvicorne;6.5;wild bees;malaise traps
+Lasioglossum laevigatum;8.5;wild bees;malaise traps
+Lasioglossum leucopus;5;wild bees;malaise traps
+Lasioglossum leucozonium;9;wild bees;malaise traps
+Lasioglossum morio;5.5;wild bees;malaise traps
+Lasioglossum pauxillum;5.5;wild bees;malaise traps
+Lasioglossum villosulum;6.5;wild bees;malaise traps
+Megachile alpicola;9.5;wild bees;malaise traps
+Megachile circumcincta;12;wild bees;malaise traps
+Megachile ligniseca;14;wild bees;malaise traps
+Megachile nigriventris;15;wild bees;malaise traps
+Megachile willughbiella;13.5;wild bees;malaise traps
+Osmia parietina;8.5;wild bees;malaise traps
+Sphecodes ferruginatus;7.5;wild bees;malaise traps
+Sphecodes gibbus;10;wild bees;malaise traps
+Sphecodes hyalinatus;5.5;wild bees;malaise traps
+Sphecodes monilicornis;8.5;wild bees;malaise traps
+Trachusa byssina;11.5;wild bees;malaise traps
+Andrena ampla;10;wild bees;malaise traps
+Andrena bicolor;9.5;wild bees;malaise traps
+Andrena cineraria;14;wild bees;malaise traps
+Andrena fulvago;10.5;wild bees;malaise traps
+Andrena fulvida;NA;wild bees;malaise traps
+Andrena humilis;11;wild bees;malaise traps
+Andrena proxima;10;wild bees;malaise traps
+Andrena semilaevis;6.5;wild bees;malaise traps
+Andrena viridescens;7;wild bees;malaise traps
+Anthophora quadrimaculata;11;wild bees;malaise traps
+Bombus lucorum;12.5;wild bees;malaise traps
+Chelostoma rapunculi;9;wild bees;malaise traps
+Dufourea dentiventris;7.5;wild bees;malaise traps
+Hoplitis leucomelana;8;wild bees;malaise traps
+Hylaeus gredleri;5.5;wild bees;malaise traps
+Lasioglossum zonulum;9.5;wild bees;malaise traps
+Nomada facilis;7;wild bees;malaise traps
+Sphecodes crassus;6.5;wild bees;malaise traps
+Sphecodes geoffrellus;5.5;wild bees;malaise traps
+Stelis ornatula;6.5;wild bees;malaise traps
+Baccha elongata;9;hoverflies;malaise traps
+Blera fallax;11;hoverflies;malaise traps
+Brachyopa dorsata;7.5;hoverflies;malaise traps
+Brachyopa vittata;9.5;hoverflies;malaise traps
+Brachypalpus laphriformis;11;hoverflies;malaise traps
+Chalcosyrphus piger;12;hoverflies;malaise traps
+Cheilosia albitarsis;8.5;hoverflies;malaise traps
+Cheilosia barbata;8;hoverflies;malaise traps
+Cheilosia canicularis;14;hoverflies;malaise traps
+Cheilosia frontalis;7;hoverflies;malaise traps
+Cheilosia gigantea;NA;hoverflies;malaise traps
+Cheilosia himantopus;14;hoverflies;malaise traps
+Cheilosia impressa;7;hoverflies;malaise traps
+Cheilosia impudens;NA;hoverflies;malaise traps
+Cheilosia lasiopa;9.5;hoverflies;malaise traps
+Cheilosia latifrons;8;hoverflies;malaise traps
+Cheilosia loewi;NA;hoverflies;malaise traps
+Cheilosia longula;7.5;hoverflies;malaise traps
+Cheilosia melanura;NA;hoverflies;malaise traps
+Cheilosia mutabilis;6.5;hoverflies;malaise traps
+Cheilosia nigripes;8.5;hoverflies;malaise traps
+Cheilosia nivalis;NA;hoverflies;malaise traps
+Cheilosia personata;NA;hoverflies;malaise traps
+Cheilosia proxima;8;hoverflies;malaise traps
+Cheilosia pubera;6.5;hoverflies;malaise traps
+Cheilosia rhynchops;NA;hoverflies;malaise traps
+Cheilosia semifasciata;7;hoverflies;malaise traps
+Cheilosia vangaveri;NA;hoverflies;malaise traps
+Cheilosia variabilis;10.5;hoverflies;malaise traps
+Chrysotoxum arcuatum;10.5;hoverflies;malaise traps
+Chrysotoxum bicinctum;10;hoverflies;malaise traps
+Chrysotoxum biguttatum;NA;hoverflies;malaise traps
+Chrysotoxum fasciolatum;15;hoverflies;malaise traps
+Chrysotoxum festivum;13.5;hoverflies;malaise traps
+Chrysotoxum intermedium;13;hoverflies;malaise traps
+Chrysotoxum octomaculatum;11.5;hoverflies;malaise traps
+Chrysotoxum vernale;11.5;hoverflies;malaise traps
+Chrysotoxum verralli;11.5;hoverflies;malaise traps
+Criorhina berberina;10.5;hoverflies;malaise traps
+Dasysyrphus albostriatus;9;hoverflies;malaise traps
+Dasysyrphus amalopis;NA;hoverflies;malaise traps
+Dasysyrphus intrudens sp. complex;NA;hoverflies;malaise traps
+Dasysyrphus pinastri;9;hoverflies;malaise traps
+Dasysyrphus tricinctus;11;hoverflies;malaise traps
+Dasysyrphus venustus;8.5;hoverflies;malaise traps
+Didea alneti;13.5;hoverflies;malaise traps
+Didea fasciata;11.5;hoverflies;malaise traps
+Epistrophe grossulariae;14;hoverflies;malaise traps
+Epistrophella euchroma;9;hoverflies;malaise traps
+Episyrphus balteatus;10;hoverflies;malaise traps
+Eriozona syrphoides;NA;hoverflies;malaise traps
+Eristalis arbustorum;NA;hoverflies;malaise traps
+Eristalis jugorum;13;hoverflies;malaise traps
+Eristalis pertinax;14;hoverflies;malaise traps
+Eristalis rupium;11.5;hoverflies;malaise traps
+Eristalis similis;14.5;hoverflies;malaise traps
+Eristalis tenax;15;hoverflies;malaise traps
+Eumerus consimilis;NA;hoverflies;malaise traps
+Eumerus flavitarsis;7;hoverflies;malaise traps
+Eumerus sabulonum;8;hoverflies;malaise traps
+Eupeodes corollae;8.5;hoverflies;malaise traps
+Eupeodes lapponicus;10.5;hoverflies;malaise traps
+Eupeodes latifasciatus;8.5;hoverflies;malaise traps
+Eupeodes luniger;11;hoverflies;malaise traps
+Eupeodes nielseni;10;hoverflies;malaise traps
+Fagisyrphus cinctus;8.5;hoverflies;malaise traps
+Ferdinandea cuprea;9.5;hoverflies;malaise traps
+Helophilus pendulus;12;hoverflies;malaise traps
+Helophilus trivittatus;16;hoverflies;malaise traps
+Heringia pubescens;NA;hoverflies;malaise traps
+Lejota ruficornis;NA;hoverflies;malaise traps
+Leucozona glaucia;12;hoverflies;malaise traps
+Leucozona lucorum;11;hoverflies;malaise traps
+Melangyna cincta;8.5;hoverflies;malaise traps
+Melangyna lasiophthalma;9;hoverflies;malaise traps
+Melangyna umbellatarum;10.5;hoverflies;malaise traps
+Melanogaster hirtella;7;hoverflies;malaise traps
+Melanogaster nuda;6;hoverflies;malaise traps
+Melanostoma mellinum;6.5;hoverflies;malaise traps
+Meligramma cingulata;8;hoverflies;malaise traps
+Meligramma guttata;8;hoverflies;malaise traps
+Meliscaeva auricollis;9;hoverflies;malaise traps
+Meliscaeva cinctella;9;hoverflies;malaise traps
+Merodon aureus;8.5;hoverflies;malaise traps
+Merodon rufus;11;hoverflies;malaise traps
+Microdon analis;9.5;hoverflies;malaise traps
+Microdon devius;10.5;hoverflies;malaise traps
+Microdon mutabilis;10.5;hoverflies;malaise traps
+Myathropa florea;12;hoverflies;malaise traps
+Neoascia podagrica;5.5;hoverflies;malaise traps
+Paragus albifrons;6;hoverflies;malaise traps
+Paragus haemorrhous;5;hoverflies;malaise traps
+Paragus pecchiolii;6;hoverflies;malaise traps
+Paragus punctulatus;NA;hoverflies;malaise traps
+Parasyrphus annulatus;7;hoverflies;malaise traps
+Parasyrphus lineola;NA;hoverflies;malaise traps
+Parasyrphus macularis;9;hoverflies;malaise traps
+Parasyrphus malinellus;8.5;hoverflies;malaise traps
+Parasyrphus relictus;NA;hoverflies;malaise traps
+Parasyrphus vittiger;9;hoverflies;malaise traps
+Pelecocera scaevoides;6;hoverflies;malaise traps
+Pelecocera tricincta;5.5;hoverflies;malaise traps
+Pipiza quadrimaculata;6.5;hoverflies;malaise traps
+Pipizella viduata;6;hoverflies;malaise traps
+Pipizella zeneggenensis;6.5;hoverflies;malaise traps
+Platycheirus albimanus;8.5;hoverflies;malaise traps
+Platycheirus angustatus;7;hoverflies;malaise traps
+Platycheirus clypeatus;8;hoverflies;malaise traps
+Platycheirus melanopsis;8;hoverflies;malaise traps
+Platycheirus naso;NA;hoverflies;malaise traps
+Platycheirus parmatus;10;hoverflies;malaise traps
+Platycheirus rosarum;NA;hoverflies;malaise traps
+Platycheirus scutatus;8;hoverflies;malaise traps
+Platycheirus varipes;NA;hoverflies;malaise traps
+Rhingia borealis;7;hoverflies;malaise traps
+Rhingia campestris;9.5;hoverflies;malaise traps
+Rhingia rostrata;9;hoverflies;malaise traps
+Scaeva pyrastri;12.5;hoverflies;malaise traps
+Scaeva selenitica;13.5;hoverflies;malaise traps
+Sericomyia bombiformis;18;hoverflies;malaise traps
+Sericomyia silentis;16;hoverflies;malaise traps
+Sericomyia superbiens;14.5;hoverflies;malaise traps
+Sphaerophoria batava;NA;hoverflies;malaise traps
+Sphaerophoria philanthus;7.5;hoverflies;malaise traps
+Sphaerophoria scripta;9.5;hoverflies;malaise traps
+Sphegina clunipes;6.5;hoverflies;malaise traps
+Sphegina sibirica;7.5;hoverflies;malaise traps
+Sphegina verecunda;6;hoverflies;malaise traps
+Syritta pipiens;7;hoverflies;malaise traps
+Syrphocheilosia claviventris;NA;hoverflies;malaise traps
+Syrphus ribesii;11;hoverflies;malaise traps
+Syrphus torvus;11;hoverflies;malaise traps
+Syrphus vitripennis;10;hoverflies;malaise traps
+Temnostoma apiforme;14.5;hoverflies;malaise traps
+Temnostoma bombylans;14;hoverflies;malaise traps
+Trichopsomyia flavitarsis;5.5;hoverflies;malaise traps
+Trichopsomyia joratensis;7.5;hoverflies;malaise traps
+Volucella bombylans;14;hoverflies;malaise traps
+Volucella pellucens;15.5;hoverflies;malaise traps
+Xanthandrus comtus;10;hoverflies;malaise traps
+Xanthogramma festivum;NA;hoverflies;malaise traps
+Xanthogramma laetum;9;hoverflies;malaise traps
+Xylota ignava;13;hoverflies;malaise traps
+Xylota jakutorum;11;hoverflies;malaise traps
+Xylota segnis;11.5;hoverflies;malaise traps
+Xylota sylvarum;13.5;hoverflies;malaise traps
+Aglais urticae;24;butterflies;malaise traps
+Anthocharis cardamines;21.5;butterflies;malaise traps
+Aphantopus hyperantus;22;butterflies;malaise traps
+Aporia crataegi;31.5;butterflies;malaise traps
+Argynnis adippe;29;butterflies;malaise traps
+Argynnis aglaja;28;butterflies;malaise traps
+Aricia agestis;13.75;butterflies;malaise traps
+Boloria euphrosyne;20.5;butterflies;malaise traps
+Boloria pales;18.5;butterflies;malaise traps
+Boloria thore;20.5;butterflies;malaise traps
+Boloria titania;21;butterflies;malaise traps
+Callophrys rubi;14.5;butterflies;malaise traps
+Carterocephalus palaemon;14.5;butterflies;malaise traps
+Coenonympha arcania;18.5;butterflies;malaise traps
+Coenonympha pamphilus;16;butterflies;malaise traps
+Cupido minimus;11.5;butterflies;malaise traps
+Cyaniris semiargus;15.5;butterflies;malaise traps
+Erebia aethiops;24;butterflies;malaise traps
+Erebia eriphyle;19;butterflies;malaise traps
+Erebia euryale;22;butterflies;malaise traps
+Erebia ligea;26;butterflies;malaise traps
+Erebia manto;20;butterflies;malaise traps
+Erebia oeme;20.5;butterflies;malaise traps
+Erebia pandrose;22.5;butterflies;malaise traps
+Erebia pharte;17.5;butterflies;malaise traps
+Erebia pronoe;23;butterflies;malaise traps
+Erynnis tages;13.5;butterflies;malaise traps
+Hamearis lucina;15.5;butterflies;malaise traps
+Hesperia comma;15;butterflies;malaise traps
+Lasiommata maera;25;butterflies;malaise traps
+Lasiommata petropolitana;22;butterflies;malaise traps
+Leptidea sinapis;21;butterflies;malaise traps
+Lycaena hippothoe;16.5;butterflies;malaise traps
+Lycaena tityrus;15;butterflies;malaise traps
+Maniola jurtina;24;butterflies;malaise traps
+Melitaea athalia;19;butterflies;malaise traps
+Melitaea diamina;19.5;butterflies;malaise traps
+Ochlodes sylvanus;15.5;butterflies;malaise traps
+Papilio machaon;38.5;butterflies;malaise traps
+Pieris bryoniae;23;butterflies;malaise traps
+Pieris rapae;25;butterflies;malaise traps
+Polygonia c.album;24;butterflies;malaise traps
+Polyommatus coridon;16.5;butterflies;malaise traps
+Polyommatus icarus;15;butterflies;malaise traps
+Pyrgus andromedae;15.5;butterflies;malaise traps
+Pyrgus malvae;12;butterflies;malaise traps
+Thymelicus lineola;13.5;butterflies;malaise traps
+Thymelicus sylvestris;13.5;butterflies;malaise traps
+Vanessa atalanta;29.5;butterflies;malaise traps
+Vanessa cardui;30.5;butterflies;malaise traps
+Chorthippus albomarginatus;20.25;grasshoppers;malaise traps
+Chorthippus albomarginatus;20.25;grasshoppers;malaise traps
+Chorthippus apricarius;19;grasshoppers;malaise traps
+Chorthippus biguttulus;19.5;grasshoppers;malaise traps
+Chorthippus biguttulus;19.5;grasshoppers;malaise traps
+Chorthippus biguttulus;19.5;grasshoppers;malaise traps
+Chorthippus biguttulus;19.5;grasshoppers;malaise traps
+Chorthippus biguttulus;19.5;grasshoppers;malaise traps
+Chorthippus brunneus;21.5;grasshoppers;malaise traps
+Chorthippus brunneus;21.5;grasshoppers;malaise traps
+Chrysochraon dispar;25;grasshoppers;malaise traps
+Decticus verrucivorus;35.5;grasshoppers;malaise traps
+Euthystira brachyptera;20.5;grasshoppers;malaise traps
+Gomphocerippus rufus;20;grasshoppers;malaise traps
+Mecostethus parapleurus;28;grasshoppers;malaise traps
+Metrioptera brachyptera;19;grasshoppers;malaise traps
+Miramella alpina;24.5;grasshoppers;malaise traps
+Omocestus rufipes;16.5;grasshoppers;malaise traps
+Omocestus viridulus;19.5;grasshoppers;malaise traps
+Omocestus viridulus;19.5;grasshoppers;malaise traps
+Omocestus viridulus;19.5;grasshoppers;malaise traps
+Omocestus viridulus;19.5;grasshoppers;malaise traps
+Omocestus viridulus;19.5;grasshoppers;malaise traps
+Pholidoptera aptera;23;grasshoppers;malaise traps
+Pholidoptera griseoaptera;18;grasshoppers;malaise traps
+Podisma pedestris;27;grasshoppers;malaise traps
+Podisma pedestris;27;grasshoppers;malaise traps
+Podisma pedestris;27;grasshoppers;malaise traps
+Pseudochorthippus parallelus;20;grasshoppers;malaise traps
+Pseudochorthippus parallelus;20;grasshoppers;malaise traps
+Pseudochorthippus parallelus;20;grasshoppers;malaise traps
+Pseudochorthippus parallelus;20;grasshoppers;malaise traps
+Psophus stridulus;33;grasshoppers;malaise traps
+Roeseliana roeselii;17.75;grasshoppers;malaise traps
+Stenobothrus lineatus;23.5;grasshoppers;malaise traps
+Tetrix bipunctata;10.6;grasshoppers;malaise traps
+Tetrix subulata;12.95;grasshoppers;malaise traps
+Tetrix tenuicornis;9.45;grasshoppers;malaise traps
+Tettigonia cantans;31;grasshoppers;malaise traps
+Andrena carantonica;13;wild bees;transect walks
+Andrena chrysosceles;9.5;wild bees;transect walks
+Andrena fucata;11.5;wild bees;transect walks
+Andrena intermedia;11.5;wild bees;transect walks
+Andrena minutula;6;wild bees;transect walks
+Andrena subopaca;7;wild bees;transect walks
+Andrena wilkella;11.5;wild bees;transect walks
+Anthidiellum strigatum;6.5;wild bees;transect walks
+Anthophora furcata;11.5;wild bees;transect walks
+Bombus campestris;16.5;wild bees;transect walks
+Bombus gerstaeckeri;16;wild bees;transect walks
+Bombus hortorum;13.5;wild bees;transect walks
+Bombus lapidarius;14;wild bees;transect walks
+Bombus monticola;12.5;wild bees;transect walks
+Bombus mucidus;14;wild bees;transect walks
+Bombus pratorum;11.5;wild bees;transect walks
+Bombus pyrenaeus;10.5;wild bees;transect walks
+Bombus soroeensis;12;wild bees;transect walks
+Bombus sylvestris;15;wild bees;transect walks
+Bombus wurflenii;14.5;wild bees;transect walks
+Dufourea alpina;6;wild bees;transect walks
+Halictus confusus;7;wild bees;transect walks
+Halictus rubicundus;10.5;wild bees;transect walks
+Halictus tumulorum;7;wild bees;transect walks
+Hoplitis mitis;8;wild bees;transect walks
+Hylaeus sinuatus;5.5;wild bees;transect walks
+Lasioglossum albipes;8;wild bees;transect walks
+Lasioglossum alpigenum;NA;wild bees;transect walks
+Lasioglossum calceatum;8.5;wild bees;transect walks
+Lasioglossum cupromicans;5.5;wild bees;transect walks
+Lasioglossum fulvicorne;6.5;wild bees;transect walks
+Lasioglossum laevigatum;8.5;wild bees;transect walks
+Lasioglossum leucopus;5;wild bees;transect walks
+Lasioglossum leucozonium;9;wild bees;transect walks
+Lasioglossum morio;5.5;wild bees;transect walks
+Lasioglossum pauxillum;5.5;wild bees;transect walks
+Lasioglossum villosulum;6.5;wild bees;transect walks
+Megachile alpicola;9.5;wild bees;transect walks
+Megachile circumcincta;12;wild bees;transect walks
+Megachile ligniseca;14;wild bees;transect walks
+Megachile nigriventris;15;wild bees;transect walks
+Megachile willughbiella;13.5;wild bees;transect walks
+Osmia parietina;8.5;wild bees;transect walks
+Sphecodes ferruginatus;7.5;wild bees;transect walks
+Sphecodes gibbus;10;wild bees;transect walks
+Sphecodes hyalinatus;5.5;wild bees;transect walks
+Sphecodes monilicornis;8.5;wild bees;transect walks
+Trachusa byssina;11.5;wild bees;transect walks
+Andrena falsifica;6.5;wild bees;transect walks
+Andrena lapponica;12.5;wild bees;transect walks
+Andrena ovatula;9.5;wild bees;transect walks
+Andrena ruficrus;9.5;wild bees;transect walks
+Anthidium oblongatum;9;wild bees;transect walks
+Apis mellifera;NA;wild bees;transect walks
+Bombus barbutellus;18;wild bees;transect walks
+Bombus bohemicus;24;wild bees;transect walks
+Bombus humilis;12;wild bees;transect walks
+Bombus jonellus;11.5;wild bees;transect walks
+Bombus mendax;15.5;wild bees;transect walks
+Bombus pascuorum;12;wild bees;transect walks
+Bombus ruderarius;12.5;wild bees;transect walks
+Bombus rupestris;20;wild bees;transect walks
+Ceratina cyanea;6.5;wild bees;transect walks
+Chelostoma campanularum;6;wild bees;transect walks
+Chelostoma florisomne;9;wild bees;transect walks
+Coelioxys alata;12;wild bees;transect walks
+Coelioxys inermis;9.5;wild bees;transect walks
+Halictus scabiosae;13.5;wild bees;transect walks
+Heriades truncorum;6.5;wild bees;transect walks
+Hylaeus alpinus;NA;wild bees;transect walks
+Hylaeus annulatus;7;wild bees;transect walks
+Hylaeus confusus;7;wild bees;transect walks
+Lasioglossum fratellum;7;wild bees;transect walks
+Megachile centuncularis;11.5;wild bees;transect walks
+Melitta haemorrhoidalis;12.5;wild bees;transect walks
+Nomada alboguttata;8;wild bees;transect walks
+Nomada flavoguttata;6;wild bees;transect walks
+Nomada integra;7;wild bees;transect walks
+Osmia bicolor;10.5;wild bees;transect walks
+Osmia villosa;11;wild bees;transect walks
+Panurginus herzi;6.5;wild bees;transect walks
+Panurginus montanus;6.5;wild bees;transect walks
+Cheilosia aff. urbana;7;hoverflies;transect walks
+Cheilosia albitarsis;8.5;hoverflies;transect walks
+Cheilosia bracusi;NA;hoverflies;transect walks
+Cheilosia canicularis;14;hoverflies;transect walks
+Cheilosia chlorus;9.5;hoverflies;transect walks
+Cheilosia frontalis;7;hoverflies;transect walks
+Cheilosia gagatea;NA;hoverflies;transect walks
+Cheilosia impressa;7;hoverflies;transect walks
+Cheilosia lasiopa;9.5;hoverflies;transect walks
+Cheilosia loewi;NA;hoverflies;transect walks
+Cheilosia longula;7.5;hoverflies;transect walks
+Cheilosia melanopa;NA;hoverflies;transect walks
+Cheilosia melanura;NA;hoverflies;transect walks
+Cheilosia montana;NA;hoverflies;transect walks
+Cheilosia mutabilis;6.5;hoverflies;transect walks
+Cheilosia nigripes;8.5;hoverflies;transect walks
+Cheilosia pedemontana;NA;hoverflies;transect walks
+Cheilosia proxima;8;hoverflies;transect walks
+Cheilosia pubera;6.5;hoverflies;transect walks
+Cheilosia rhynchops;NA;hoverflies;transect walks
+Cheilosia semifasciata;7;hoverflies;transect walks
+Cheilosia vernalis agg.;6.5;hoverflies;transect walks
+Cheilosia vicina;7;hoverflies;transect walks
+Chrysotoxum arcuatum;10.5;hoverflies;transect walks
+Chrysotoxum bicinctum;10;hoverflies;transect walks
+Dasysyrphus pinastri;9;hoverflies;transect walks
+Dasysyrphus venustus;8.5;hoverflies;transect walks
+Didea alneti;13.5;hoverflies;transect walks
+Didea fasciata;11.5;hoverflies;transect walks
+Epistrophe diaphana;11.5;hoverflies;transect walks
+Epistrophe grossulariae;14;hoverflies;transect walks
+Episyrphus balteatus;10;hoverflies;transect walks
+Eristalis arbustorum;NA;hoverflies;transect walks
+Eristalis jugorum;13;hoverflies;transect walks
+Eristalis picea;12;hoverflies;transect walks
+Eristalis similis;14.5;hoverflies;transect walks
+Eristalis tenax;15;hoverflies;transect walks
+Eumerus flavitarsis;7;hoverflies;transect walks
+Eupeodes corollae;8.5;hoverflies;transect walks
+Eupeodes lapponicus;10.5;hoverflies;transect walks
+Eupeodes latifasciatus;8.5;hoverflies;transect walks
+Eupeodes luniger;11;hoverflies;transect walks
+Eupeodes nitens;10.5;hoverflies;transect walks
+Helophilus trivittatus;16;hoverflies;transect walks
+Melangyna barbifrons;8.5;hoverflies;transect walks
+Melanostoma cf. certum;NA;hoverflies;transect walks
+Melanostoma mellinum;6.5;hoverflies;transect walks
+Melanostoma scalare;8;hoverflies;transect walks
+Meliscaeva auricollis;9;hoverflies;transect walks
+Meliscaeva cinctella;9;hoverflies;transect walks
+Merodon aureus;8.5;hoverflies;transect walks
+Merodon cinereus;NA;hoverflies;transect walks
+Merodon rufus;11;hoverflies;transect walks
+Microdon devius;10.5;hoverflies;transect walks
+Microdon mutabilis;10.5;hoverflies;transect walks
+Myathropa florea;12;hoverflies;transect walks
+Paragus testaceus;NA;hoverflies;transect walks
+Parasyrphus annulatus;7;hoverflies;transect walks
+Parasyrphus lineolus;9;hoverflies;transect walks
+Parasyrphus macularis;9;hoverflies;transect walks
+Parasyrphus vittiger;9;hoverflies;transect walks
+Pipiza noctiluca;7.5;hoverflies;transect walks
+Pipiza notata;7.5;hoverflies;transect walks
+Pipiza quadrimaculata;6.5;hoverflies;transect walks
+Pipizella annulata;7;hoverflies;transect walks
+Pipizella viduata;6;hoverflies;transect walks
+Platycheirus albimanus;8.5;hoverflies;transect walks
+Platycheirus clypeatus;8;hoverflies;transect walks
+Platycheirus europaeus;8;hoverflies;transect walks
+Platycheirus manicatus;9.5;hoverflies;transect walks
+Platycheirus melanopsis;8;hoverflies;transect walks
+Platycheirus splendidus;7;hoverflies;transect walks
+Platycheirus tarsalis;9.5;hoverflies;transect walks
+Platycheirus tatricus;NA;hoverflies;transect walks
+Scaeva pyrastri;12.5;hoverflies;transect walks
+Scaeva selenitica;13.5;hoverflies;transect walks
+Sericomyia bombiformis;18;hoverflies;transect walks
+Sphaerophoria abbreviata;NA;hoverflies;transect walks
+Sphaerophoria estebani;NA;hoverflies;transect walks
+Sphaerophoria infuscata;NA;hoverflies;transect walks
+Sphaerophoria interrupta;8.5;hoverflies;transect walks
+Sphaerophoria scripta;9.5;hoverflies;transect walks
+Sphaerophoria taeniata;9;hoverflies;transect walks
+Syrphus rectus;NA;hoverflies;transect walks
+Syrphus ribesii;11;hoverflies;transect walks
+Syrphus torvus;11;hoverflies;transect walks
+Syrphus vitripennis;10;hoverflies;transect walks
+Temnostoma bombylans;14;hoverflies;transect walks
+Trichopsomyia joratensis;7.5;hoverflies;transect walks
+Volucella bombylans;14;hoverflies;transect walks
+Volucella pellucens;15.5;hoverflies;transect walks
+Volucella plumata;NA;hoverflies;transect walks
+Xanthandrus comtus;10;hoverflies;transect walks
+Xylota jakutorum;11;hoverflies;transect walks
+Xylota segnis;11.5;hoverflies;transect walks
+Xylota triangularis;NA;hoverflies;transect walks
+Aglais urticae;24;butterflies;transect walks
+Anthocharis cardamines;21.5;butterflies;transect walks
+Aphantopus hyperantus;22;butterflies;transect walks
+Aporia crataegi;31.5;butterflies;transect walks
+Araschnia levana;17.5;butterflies;transect walks
+Argynnis adippe;29;butterflies;transect walks
+Argynnis aglaja;28;butterflies;transect walks
+Argynnis paphia;34.5;butterflies;transect walks
+Aricia agestis;13.75;butterflies;transect walks
+Boloria euphrosyne;20.5;butterflies;transect walks
+Boloria pales;18.5;butterflies;transect walks
+Boloria thore;20.5;butterflies;transect walks
+Boloria titania;21;butterflies;transect walks
+Brenthis ino;19;butterflies;transect walks
+Callophrys rubi;14.5;butterflies;transect walks
+Carterocephalus palaemon;14.5;butterflies;transect walks
+Coenonympha arcania;18.5;butterflies;transect walks
+Coenonympha gardetta;16;butterflies;transect walks
+Coenonympha pamphilus;16;butterflies;transect walks
+Colias alfacariensis;23.75;butterflies;transect walks
+Colias crocea;26.5;butterflies;transect walks
+Colias phicomone;22.5;butterflies;transect walks
+Cupido minimus;11.5;butterflies;transect walks
+Cyaniris semiargus;15.5;butterflies;transect walks
+Erebia aethiops;24;butterflies;transect walks
+Erebia epiphron;18;butterflies;transect walks
+Erebia eriphyle;19;butterflies;transect walks
+Erebia euryale;22;butterflies;transect walks
+Erebia ligea;26;butterflies;transect walks
+Erebia manto;20;butterflies;transect walks
+Erebia oeme;20.5;butterflies;transect walks
+Erebia pandrose;22.5;butterflies;transect walks
+Erebia pharte;17.5;butterflies;transect walks
+Erebia pronoe;23;butterflies;transect walks
+Erynnis tages;13.5;butterflies;transect walks
+Euphydryas cynthia;19;butterflies;transect walks
+Gonepteryx rhamni;38.5;butterflies;transect walks
+Hamearis lucina;15.5;butterflies;transect walks
+Hesperia comma;15;butterflies;transect walks
+Lasiommata maera;25;butterflies;transect walks
+Lasiommata petropolitana;22;butterflies;transect walks
+Leptidea sinapis;21;butterflies;transect walks
+Lycaena hippothoe;16.5;butterflies;transect walks
+Lycaena tityrus;15;butterflies;transect walks
+Maniola jurtina;24;butterflies;transect walks
+Melitaea athalia;19;butterflies;transect walks
+Melitaea diamina;19.5;butterflies;transect walks
+Ochlodes sylvanus;15.5;butterflies;transect walks
+Papilio machaon;38.5;butterflies;transect walks
+Pararge aegeria;20;butterflies;transect walks
+Phengaris arion;19;butterflies;transect walks
+Pieris brassicae;31.5;butterflies;transect walks
+Pieris bryoniae;23;butterflies;transect walks
+Pieris rapae;25;butterflies;transect walks
+Polyommatus bellargus;16;butterflies;transect walks
+Polyommatus coridon;16.5;butterflies;transect walks
+Polyommatus icarus;15;butterflies;transect walks
+Pyrgus alveus;15.5;butterflies;transect walks
+Pyrgus andromedae;15.5;butterflies;transect walks
+Pyrgus malvae;12;butterflies;transect walks
+Thymelicus lineola;13.5;butterflies;transect walks
+Thymelicus sylvestris;13.5;butterflies;transect walks
+Vanessa atalanta;29.5;butterflies;transect walks
+Vanessa cardui;30.5;butterflies;transect walks
+Barbitistes constrictus;24;grasshoppers;transect walks
+Barbitistes serricauda;20.5;grasshoppers;transect walks
+Bryodemella tuberculata;34;grasshoppers;transect walks
+Chorthippus albomarginatus;20.25;grasshoppers;transect walks
+Chorthippus apricarius;19;grasshoppers;transect walks
+Chorthippus biguttulus;19.5;grasshoppers;transect walks
+Chorthippus brunneus;21.5;grasshoppers;transect walks
+Chorthippus dorsatus;22;grasshoppers;transect walks
+Chorthippus eisentrauti;22;grasshoppers;transect walks
+Chorthippus pullus;19;grasshoppers;transect walks
+Chrysochraon dispar;25;grasshoppers;transect walks
+Decticus verrucivorus;35.5;grasshoppers;transect walks
+Euthystira brachyptera;20.5;grasshoppers;transect walks
+Gomphocerippus rufus;20;grasshoppers;transect walks
+Gomphocerus sibiricus;22.5;grasshoppers;transect walks
+Gryllotalpa gryllotalpa;43.5;grasshoppers;transect walks
+Gryllus campestris;23;grasshoppers;transect walks
+Meconema meridionale;13.75;grasshoppers;transect walks
+Meconema thalassinum;13;grasshoppers;transect walks
+Mecostethus parapleurus;28;grasshoppers;transect walks
+Metrioptera brachyptera;19;grasshoppers;transect walks
+Miramella alpina;24.5;grasshoppers;transect walks
+Omocestus rufipes;16.5;grasshoppers;transect walks
+Omocestus viridulus;19.5;grasshoppers;transect walks
+Pholidoptera aptera;23;grasshoppers;transect walks
+Pholidoptera griseoaptera;18;grasshoppers;transect walks
+Podisma pedestris;27;grasshoppers;transect walks
+Pseudochorthippus montanus;21;grasshoppers;transect walks
+Pseudochorthippus parallelus;20;grasshoppers;transect walks
+Psophus stridulus;33;grasshoppers;transect walks
+Roeseliana roeselii;17.75;grasshoppers;transect walks
+Stenobothrus lineatus;23.5;grasshoppers;transect walks
+Stethophyma grossum;32;grasshoppers;transect walks
+Tetrix bipunctata;10.6;grasshoppers;transect walks
+Tetrix kraussi;10.6;grasshoppers;transect walks
+Tetrix subulata;12.95;grasshoppers;transect walks
+Tetrix tenuicornis;9.45;grasshoppers;transect walks
+Tetrix tuerki;10.85;grasshoppers;transect walks
+Tetrix undulata;9.9;grasshoppers;transect walks
+Tettigonia cantans;31;grasshoppers;transect walks

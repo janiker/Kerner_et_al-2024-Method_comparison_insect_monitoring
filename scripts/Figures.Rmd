@@ -25,7 +25,6 @@ library(VennDiagram) # venn diagrams
 
 ```{r set-up, include = FALSE}
 # Create objects for easy access to the folders related to the project
-data_proc <- file.path("results", "data", "processed")
 figures_dir <- file.path("text", "figures")
 suppl_dir <- file.path("text", "supplementary")
 ```
@@ -34,7 +33,7 @@ read data
 
 ```{r loaddata, include=FALSE}
 ## plot data ##
-pd<-read.csv(here::here(data_proc, "plotdata.csv"), sep=";")
+pd<-read.csv(here::here("data", "plotdata.csv"), sep=";")
 pd$plot<-as.factor(pd$plot)
 
 # transformation of not normally distributed annual temperature
@@ -45,8 +44,8 @@ pd$tempy<-log(max(pd$tempy+1)-pd$tempy); pd$tempy<-max(pd$tempy)-pd$tempy
 ## 1. Venn diagrams
 
 ```{r venndiagram}
-slmal<-read.csv(here::here(data_proc, "speclistmal.csv"), row.names = 1)
-sldip<-read.csv(here::here(data_proc, "speclistdip.csv"), row.names = 1)
+slmal<-read.csv(here::here("data", "speclistmal.csv"), row.names = 1)
+sldip<-read.csv(here::here("data", "speclistdip.csv"), row.names = 1)
 
 # pollinators
 venn.diagram(
@@ -641,7 +640,7 @@ pathlegendor<-readPNG(here::here(figures_dir, "sems-single", "legendor.png"))
 #### assemble plots
 
 ```{r methsemplot, fig.cap="", echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.width=16, fig.height=11}
-png(here::here("text", "figures", "orthmeth.png"), height=16.5, width=5, res=600, units = "cm")
+png(here::here(figures_dir, "orthmeth.png"), height=16.5, width=5, res=600, units = "cm")
 
 grid.arrange(rasterGrob(ormal), rasterGrob(ordip), rasterGrob(pathlegendor), ncol=1)
 
@@ -811,7 +810,7 @@ vendip<-readPNG(here::here(figures_dir, "venns-single", "venndiagDiptera.png"))
 venhym<-readPNG(here::here(figures_dir, "venns-single", "venndiagHymenoptera.png"))
 venlep<-readPNG(here::here(figures_dir, "venns-single", "venndiagLepidoptera.png"))
 
-png(here::here("text", "supplementary", "vennspec.png"), height=3.5, width=10.5, res=600, units = "cm")
+png(here::here(suppl_dir, "vennspec.png"), height=3.5, width=10.5, res=600, units = "cm")
 
 grid.arrange(rasterGrob(vendip), rasterGrob(venhym), rasterGrob(venlep), nrow=1);grid.raster(
   readPNG(here::here(figures_dir, "logos", "hvdip.png")), width = .055, x=.035, y=.91);grid.raster(
@@ -824,7 +823,7 @@ dev.off()
 ## S6. body size comparisons
 
 ```{r body sizes}
-MT<-read.csv(here::here(data_proc, "body_sizes.csv"), row.names = 1)
+MT<-read.csv(here::here("data", "body_sizes.csv"), sep=";")
 
 library(ggtext) # including images for x axis labels
 
@@ -843,9 +842,9 @@ for (i in 1:length(levels(MT$group))){
   
 }
 
-png(here::here("text", "supplementary", "body_sizes_methods.png"), height=9, width=13.5, res=600, units = "cm")
+png(here::here(suppl_dir, "body_sizes_methods.png"), height=9, width=13.5, res=600, units = "cm")
 
-ggplot(MT, aes(col=method1, fill=method1, y=bodysize, x=group, alpha=method1)) + 
+ggplot(MT, aes(col=method, fill=method, y=bodysize, x=group, alpha=method)) + 
   geom_boxplot(outlier.shape=16, outlier.size=2, notch=FALSE) +
   theme_classic() +
   scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
@@ -865,7 +864,7 @@ dev.off()
 
 ```{r beta}
 
-png(here::here("text", "supplementary", "betadiversity.png"), height=8, width=11, res=600, units = "cm")
+png(here::here(suppl_dir, "betadiversity.png"), height=8, width=11, res=600, units = "cm")
 
 pd %>% pivot_longer(cols=c(betadivj, betadipj),names_to = c("method"),values_to="beta") %>%
   ggplot(aes(elev, beta, col=method, fill=method)) +
@@ -1022,14 +1021,14 @@ methspecplot<-function (var, xaxisname, xcoord, ycoord, tags, tagpos.x, tagpos.y
   }
 
 # elevation
-png(here::here("text", "supplementary", "elevpatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
+png(here::here(suppl_dir, "elevpatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
 
 methspecplot(elev, "elevation [m a.s.l.]", .9, .88, elevtags, 1800, Inf, 1, 1.1, allelev, elevr2, -Inf, -Inf, -.15, -.8)
 
 dev.off()
 
 # sampling temperature
-png(here::here("text", "supplementary", "temppatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
+png(here::here(suppl_dir, "temppatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
 
 methspecplot(tempright, "sampling temperature [°C]", .1, .88, temptags, -Inf, Inf, -1, 1.2, alltemp, tempr2, Inf, -Inf, 1.1, -.8)
 

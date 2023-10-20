@@ -15,15 +15,10 @@ library(tidymv) # GAM predictions
 library(tidyverse)
 ```
 
-```{r paths, include = FALSE}
-# Create objects for easy access to the folders related to the project
-data_proc <- file.path("results", "data", "processed")
-```
-
 read data
 
 ```{r loaddata, include=FALSE}
-pd<-read.csv(here::here(data_proc, "plotdata.csv"), sep=";")
+pd<-read.csv(here::here("data", "plotdata.csv"), sep=";")
 
 # transformation of not normally distributed annual temperature
 pd$tempy<-log(max(pd$tempy+1)-pd$tempy); pd$tempy<-max(pd$tempy)-pd$tempy
@@ -163,9 +158,9 @@ ordipsm
 ## S6. body size comparisons
 
 ```{r bodysizemeth}
-MT<-read.csv(here::here(data_proc, "body_sizes.csv"), row.names = 1)
+MT<-read.csv(here::here("data", "body_sizes.csv"), sep=";")
 
-body<-summary(lme(bodysize~method1, random=~1|group, data=MT[!is.na(MT$bodysize),]))
+body<-summary(lme(bodysize~method, random=~1|group, data=MT[!is.na(MT$bodysize),]))
 ```
 
 ## S7. beta diversity
