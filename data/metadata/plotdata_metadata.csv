@@ -18,13 +18,21 @@ orab;grasshopper abundance from transect walks
 clpolldiv;species richness from malaise traps filtered for pollinator families that were also monitored by transect walks: hoverflies, wild bees, butterflies
 clpolldip;pollinator species richness from transect walks (hoverflies, wild bees, butterflies)
 clpollab;pollinator abundance from transect walks (hoverflies, wild bees, butterflies)
+wbsizedip;average body length [mm] of wild bees from transect walks
+bfsizedip;average wing length [mm] of butterflies from transect walks
+hvsizedip;average body length [mm] of hoverflies from transect walks
+orsizedip;average body length [mm] of grasshoppers from transect walks
+wbsizediv;average body length [mm] of wild bees from malaise traps
+bfsizediv;average wing length [mm] of butterflies from malaise traps
+hvsizediv;average body length [mm] of hoverflies from malaise traps
+orsizediv;average body length [mm] of grasshoppers from malaise traps
 betadivj;pollinator beta diversity from malaise traps defined by Jaddard's dissimilarity index
 betadipj;pollinator beta diversity from transect walks defined by Jaddard's dissimilarity index
 pldiv;plant richness
 pp;primary productivity: plant biomass [g] per 0.25 m² in exclosures (grazing effect excluded)
 plbm;plant biomass [g] per 0.25 m² outside of exclosures (grazing effect included)
 deadwood;average deadwood cover [%] in 60x60 m plot during transect walks
-flcov;average flower cover [%] in plot during transect walks
+flow_cov;average flower cover [%] in plot during transect walks
 herb_cov;average herb cover [%] in plot during transect walks
 herb_height;average herb height [cm] in plot duringtransect walks
 shrub_cov;average shrub cover [%] in plot during transect walks

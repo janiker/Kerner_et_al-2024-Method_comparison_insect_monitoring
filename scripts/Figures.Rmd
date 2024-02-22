@@ -7,10 +7,14 @@ output: word_document
 load libraries
 
 ```{r libraries, include=FALSE}
+library(cowplot) # add logos outside of plot area
 library(data.table) # create empty data frame (data.table)
+library(gghalves) # rainplot (half boxplot with points)
+library(ggimage) # add custom images to single points in ggplot
 library(ggplot2)
 library(grid) # grid png-files to be able to arrange them
 library(gridExtra) # arrange png-files
+library(magick) # plot images with cowplot
 library(magrittr) # pipe operators %>%, %<>%, %T>%
 library(mgcv) # GAMs
 library(patchwork) # assemble multiple graphs together
@@ -36,12 +40,12 @@ read data
 pd<-read.csv(here::here("data", "plotdata.csv"), sep=";")
 pd$plot<-as.factor(pd$plot)
 
-# transformation of not normally distributed annual temperature
+# transformation of not normally distributed (left-skewed) annual temperature
 pd$tempy<-log(max(pd$tempy+1)-pd$tempy); pd$tempy<-max(pd$tempy)-pd$tempy
 ```
 
-# Main text
-## 1. Venn diagrams
+# Main Text
+## 1. venn diagrams
 
 ```{r venndiagram}
 slmal<-read.csv(here::here("data", "speclistmal.csv"), row.names = 1)
@@ -101,10 +105,10 @@ venny<-function(order, cat.name1, cat.name2, pos1, pos2, rotation, extpos, extdi
         )
 }
 
-venny("Orthoptera", "malaise traps", "transect walks", 340, 20, 0, 60, -0.2, 0, 0.04, 1.3)
+venny("Orthoptera", "malaise traps", "transect walks", 160, 200, 180, 60, -0.2, 0, 0.055, 1.3)
 ```
 
-## 2. Elevational & sampling temperature patterns pollinators & grasshoppers
+## 2. elevational & sampling temperature patterns pollinators & grasshoppers
 
 ```{r methpatternsfunc}
 mp<-pivot_longer(data=pd, cols=c(clpolldiv, clpolldip, divor, ordip),names_to = c("group"),values_to="spec.no") 
@@ -117,7 +121,7 @@ mp$guild <-case_when(mp$group %in% c("clpolldiv", "clpolldip") ~ "pollinators",
 mp$guild<-factor(mp$guild, ordered = T)
 
 # adjusting sample temperature to use only sampling periods of each method
-mp$tempright <-case_when(mp$group =="clpolldip" ~ mp$samplpoll,
+mp$tempright <-case_when(mp$group == "clpolldip" ~ mp$samplpoll,
                          mp$group == "ordip" ~ mp$samplor,
                          mp$group %in% c("clpolldiv", "divor") ~ mp$tempsampl)
 
@@ -153,11 +157,11 @@ modortemp<-rbind(modortemp[modortemp$method=="malaise traps" &
                            modortemp$tempright<=max(mp$samplor),])
 
 
-methplot<-function (var, xaxisname, dataframe, guild, buc) {
+methplot<-function (var, xaxisname, dataframe, guild, buc, textx) {
   ggplot(aes({{var}}, spec.no, group=method, col=method, fill=method), data=dataframe) +
   geom_ribbon(aes(ymin = CI_lower, ymax = CI_upper), alpha=0.3, colour = NA) + # colour=NA to remove outer contours
   geom_point(alpha=0.6, pch=16, data=mp[mp$guild==guild,]) +
-  geom_line(lwd=1)+
+  geom_line(aes(linetype=method), lwd=1)+
   theme_classic() +
   theme(axis.text = element_text(size=10),
         axis.title = element_text(size=10),
@@ -165,12 +169,13 @@ methplot<-function (var, xaxisname, dataframe, guild, buc) {
   labs(x=xaxisname, y="species richness") +
   scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
     scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"), name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
-  guides(alpha="none") + # no legend for alpha
-    annotate("text", x=-Inf, y=Inf, label=buc, hjust=-1, vjust=1, size=5)
+  scale_linetype_manual(values = c("malaise traps"="solid", "transect walks"="solid"), name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
+  guides(shape="none", size="none", alpha="none") + # no legend for everything except linetype
+    annotate("text", x=textx, y=Inf, label=buc, hjust=-1, vjust=1, size=5)
 }
 
 # plot only points without function lines for grasshopper sampling temperature (in model not significant, only significant effect of elevation)
-methpoints<-function (var, xaxisname, dataframe, guild, buc) {
+methpoints<-function (var, xaxisname, dataframe, guild, buc, textx) {
   ggplot(aes({{var}}, spec.no, group=method, col=method, fill=method), data=dataframe) +
   geom_point(alpha=0.6, pch=16, data=mp[mp$guild==guild,]) +
   theme_classic() +
@@ -180,32 +185,41 @@ methpoints<-function (var, xaxisname, dataframe, guild, buc) {
   labs(x=xaxisname, y="species richness") +
   scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
     scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"), name="sampling\nmethod", labels=c("malaise traps"="malaise\ntraps", "transect walks"="transect\nwalks")) +
-  guides(alpha="none") + # no legend for alpha
-    annotate("text", x=-Inf, y=Inf, label=buc, hjust=-1, vjust=1, size=5)
+  guides(shape="none", size="none", alpha="none") + # manual color for line type legend & fill = white background, no legend for everything except linetype
+    annotate("text", x=textx, y=Inf, label=buc, hjust=-1, vjust=1, size=5)
 }
 
 
+# plot with ggdraw (cowplot), to be able to plot beyond plot edges (adding thermometers)
 png(here::here(figures_dir, "methpatterns.png"), height=15, width=18, res=600, units = "cm")
 
-((methplot(elev, "elevation [m a.s.l.]", modpollelev, "pollinators", "a)") + theme(legend.position="none") +
-     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "clpolldiv.png")), width = .2, x=.9, y=.92))) +
+((ggdraw() +
+    draw_plot(methplot(elev, "elevation [m a.s.l.]", modpollelev, "pollinators", "a)", -Inf) + theme(legend.position="none") +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "clpolldiv.png")), width = .2, x=.9, y=.92)))) +
     
-    (methplot(elev, "elevation [m a.s.l.]", modorelev, "grasshoppers", "b)") + theme(legend.position="none") +
-     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "divor.png")), width = .2, x=.9, y=.92)))) /
+    (ggdraw() +
+    draw_plot(methplot(elev, "elevation [m a.s.l.]", modorelev, "grasshoppers", "b)", -Inf) + theme(legend.position="none") +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "divor.png")), width = .2, x=.9, y=.92))))) /
   
-  ((methplot(tempright, "sampling temperature [°C]", modpolltemp, "pollinators", "c)") +
-      theme(legend.position=c(.95, .2), legend.title = element_blank(), legend.text = element_blank(), legend.background = element_blank()) +
-     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "malaisetrap.png")), width = .14, x=.8, y=.25)) +
-     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "kescher.png")), width = .14, x=.8, y=.1)) +
-     scale_x_continuous(breaks = c(15,20,25))) +
+  ((ggdraw() +
+      draw_plot(methplot(tempright, "sampling temperature [°C]", modpolltemp, "pollinators", "c)", Inf) +
+      theme(legend.position=c(.95, .89), legend.title = element_blank(), legend.text = element_blank(), legend.background = element_blank()) +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "malaisetrap.png")), width = .14, x=.8, y=.93)) +
+     annotation_custom(rasterGrob(readPNG(here::here(figures_dir, "logos", "kescher.png")), width = .14, x=.8, y=.8)) +
+     scale_x_reverse(breaks = c(15, 18, 21, 24))) +
+     draw_image(readPNG(here::here(figures_dir, "logos", "tempy.png")), width = .07, x=.115, y=-0.45) +
+     draw_image(readPNG(here::here(figures_dir, "logos", "tempy_low.png")), width = .07, x=0.93, y=-0.45)) +
      
-     (methpoints(tempright, "sampling temperature [°C]", mp, "grasshoppers", "d)") +
-     theme(legend.position="none") + scale_x_continuous(breaks = c(15,20,25))))
+     (ggdraw() +
+        draw_plot(methpoints(tempright, "sampling temperature [°C]", mp, "grasshoppers", "d)", Inf) +
+     theme(legend.position="none") + scale_x_reverse(breaks = c(15, 18, 21))) +
+       draw_image(readPNG(here::here(figures_dir, "logos", "tempy.png")), width = .07, x=.115, y=-0.45) +
+       draw_image(readPNG(here::here(figures_dir, "logos", "tempy_low.png")), width = .07, x=0.93, y=-0.45)))
 
 dev.off()
 ```
 
-## 3. & 4. Path models
+## 3. & 4. path models
 
 ### functions
 
@@ -798,7 +812,7 @@ grid.arrange(rasterGrob(pathbasemeth), rasterGrob(pathlegendbasepoll), ncol=2)
 dev.off()
 ```
 
-## S5. Venn diagrams individual species groups
+## S5. venn diagrams individual species groups
 
 ```{r venndiagram}
 # function see 1. Venn diagrams - grasshoppers
@@ -820,77 +834,11 @@ grid.arrange(rasterGrob(vendip), rasterGrob(venhym), rasterGrob(venlep), nrow=1)
 dev.off()
 ```
 
-## S6. body size comparisons
-
-```{r body sizes}
-MT<-read.csv(here::here("data", "body_sizes.csv"), sep=";")
-
-library(ggtext) # including images for x axis labels
-
-# define images as labels (html code included)
-
-imgpaths<-c(here::here(figures_dir, "logos", "divwb.png"), here::here(figures_dir, "logos", "divhv.png"),
-            here::here(figures_dir, "logos", "divbf.png"), here::here(figures_dir, "logos", "divor.png"))
-
-labels <- c()
-
-for (i in 1:length(levels(MT$group))){
-  
-  img.name <- levels(MT$group)[i]
-  
-  labels <- c(labels, paste0("<img src='", imgpaths[i],  "' width='25' /><br>*", img.name,"*"))
-  
-}
-
-png(here::here(suppl_dir, "body_sizes_methods.png"), height=9, width=13.5, res=600, units = "cm")
-
-ggplot(MT, aes(col=method, fill=method, y=bodysize, x=group, alpha=method)) + 
-  geom_boxplot(outlier.shape=16, outlier.size=2, notch=FALSE) +
-  theme_classic() +
-  scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
-                    name=element_blank()) +
-  scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
-                    name=element_blank()) +
-  scale_alpha_manual(values = c("malaise traps"=.5, "transect walks"=.5), name=element_blank()) +
-  labs(x=element_blank(), y="body size [mm]") +
-  scale_x_discrete(name = NULL, labels = labels) + # use images for axis labels
-  theme(axis.text.x = element_markdown(), # add text to image labels
-    legend.position=c(.14, .93))
-
-dev.off()
-```
-
-## S7. beta diversity
-
-```{r beta}
-
-png(here::here(suppl_dir, "betadiversity.png"), height=8, width=11, res=600, units = "cm")
-
-pd %>% pivot_longer(cols=c(betadivj, betadipj),names_to = c("method"),values_to="beta") %>%
-  ggplot(aes(elev, beta, col=method, fill=method)) +
-  geom_point(size=1.5, alpha=0.6, shape=16) +
-  geom_smooth(aes(linetype=method), method="gam", formula = y ~ s(x, k=4), se = T, lwd = .8) +
-  theme_classic() +
-  labs(x="elevation [m a.s.l.]", y="beta diversity") +
-  theme(legend.position=c(.86, .93)) +
-  scale_color_manual(values = c("betadivj"="#21908dff", "betadipj"="#440154ff"),
-         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
-         name=element_blank()) +
-  scale_fill_manual(values = c("betadivj"="#21908dff", "betadipj"="#440154ff"),
-         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
-         name=element_blank()) +
-  scale_linetype_manual(values = c("betadivj"="solid", "betadipj"="dotdash"),
-         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
-         name=element_blank())
-
-dev.off()
-```
-
-## S8 & S9. Elevational & sampling temperature patterns for individual pollinator groups
+## S6 & S7. Elevational & sampling temperature patterns for individual pollinator groups
 
 ```{r methspecgroupmodelline}
 # read analysis
-rmarkdown::render(here::here("results", "scripts", "Models.Rmd"), quiet = T) # quiet to not get text from rendering
+rmarkdown::render(here::here("scripts", "Models.Rmd"), quiet = T) # quiet to not get text from rendering
 
 # Labels
 elevtags<-data.frame(lab=c(paste(psign(elevhv$p.pv["method.L"]),"/",psign(elevhv$s.table[2,4])),
@@ -977,60 +925,252 @@ for (i in c("spec.no","SE","CI_upper","CI_lower")){ # backtransform poisson (log
   alltemp[i]<-exp(alltemp[i])
 }
 
+# remove grasshopper as level
+og<-sm[sm$group!="grasshoppers",]; og$group<-as.character(og$group); og$group<-as.factor(og$group)
+
 # plot
-methspecplot<-function (var, xaxisname, xcoord, ycoord, tags, tagpos.x, tagpos.y, xcorrect, ycorrect, dataframe, r2, rpos.x, rpos.y, rxcorrect, rycorrect) {
+methspecplot<-function (var, xaxisname, xcoord, ycoord, tags, tagpos.x, tagpos.y, xcorrect, ycorrect, dataframe, r2, rpos.x, rpos.y, rxcorrect, rycorrect, legposx, legposy, iconmin, iconmax, iconmin2, iconmax2) {
   g <- ggplot_gtable(ggplot_build(
     ggplot(aes({{var}}, spec.no, col=method), data=dataframe) +
     facet_wrap(vars(fct_inorder(group)), ncol = 1, scales = "free") +
     geom_ribbon(aes(ymin = CI_lower, ymax = CI_upper, fill=method), alpha=.4, colour = NA) +
-    geom_point(pch=16, alpha=0.6, data=sm) +
+    geom_point(pch=16, alpha=0.6, data=og) +
     geom_line(aes(linetype=method, col=method), lwd=0.7) +
     theme_classic() +
     theme(axis.text = element_text(size=10),
           axis.title = element_text(size=10),
           strip.text = element_blank(), # suppress plot labelling by facetwrap
-          legend.position = "none") +
+          legend.position=c(legposx, legposy), legend.title = element_blank(), legend.text = element_blank(), legend.background = element_blank()) +
     labs(x=xaxisname, y="species richness") +
     scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
     name="sampling\nmethod") +
     scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),name="sampling\nmethod") +
     scale_linetype_manual(values = c("malaise traps"="solid", "transect walks"="dotdash"),
       name="sampling\nmethod") +
-    scale_x_continuous(n.breaks=4) +
+    scale_x_continuous(n.breaks=4) + # for elevational patterns
+    #scale_x_reverse(n.breaks=4) + # for sampling temperature patterns
     coord_cartesian(ylim = c(0, NA)) + # set lower limit to 0 without stopping to plot se
     geom_text(inherit.aes = FALSE, data=tags, aes(x=tagpos.x, y=tagpos.y, label=lab), col="black", hjust=xcorrect, vjust=ycorrect, size=3.5) +
-    geom_text(inherit.aes = FALSE, data=r2, aes(x=rpos.x, y=rpos.y, label=lab), col="black", hjust=rxcorrect, vjust=rycorrect, size=3.5)
+    geom_text(inherit.aes = FALSE, data=r2, aes(x=rpos.x, y=rpos.y, label=lab), col="black", hjust=rxcorrect, vjust=rycorrect, size=3.5) +
+    annotation_custom(grob = rasterGrob(readPNG(here::here(figures_dir, "logos", "malaisetrap.png"))), xmin = iconmin, xmax = iconmax, ymin = 41, ymax = 50) +
+    annotation_custom(grob = rasterGrob(readPNG(here::here(figures_dir, "logos", "kescher.png"))), xmin=iconmin2, xmax=iconmax2, ymin=31, ymax=45)
   ))
 
   # add logos
   
   facets <- grep("panel", g$layout$name)
   
-  logos <- list(rasterGrob(readPNG(here::here(figures_dir, "logos", "hvdip.png")),
+  logos <- list(rasterGrob(readPNG(here::here(figures_dir, "logos", "orders", "diptera.png")),
                              width=.15, x = xcoord, y = ycoord),
                   rasterGrob(readPNG(here::here(figures_dir, "logos", "wbdip.png")),
                              width=.15, x = xcoord, y = ycoord),
-                  rasterGrob(readPNG(here::here(figures_dir, "logos", "bfdip.png")),
-                             width=.15, x = xcoord, y = .9))
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "orders", "lepidoptera.png")),
+                             width=.15, x = xcoord, y = .84))
   
   g2 <- with(g$layout[facets,],
           gtable::gtable_add_grob(g, logos,
                           t=t, l=l, b=b, r=r))
-  
-  plot(g2)
   }
 
 # elevation
 png(here::here(suppl_dir, "elevpatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
 
-methspecplot(elev, "elevation [m a.s.l.]", .9, .88, elevtags, 1800, Inf, 1, 1.1, allelev, elevr2, -Inf, -Inf, -.15, -.8)
+plot(methspecplot(elev, "elevation [m a.s.l.]", .92, .83, elevtags, Inf, Inf, 1, 1.1, allelev, elevr2, -Inf, -Inf, -.15, -.8, .1, .965, 700, 1150, 820, 1030))
 
 dev.off()
 
 # sampling temperature
 png(here::here(suppl_dir, "temppatterns-specgroups.png"), height=15, width=6, res=600, units = "cm")
 
-methspecplot(tempright, "sampling temperature [°C]", .1, .88, temptags, -Inf, Inf, -1, 1.2, alltemp, tempr2, Inf, -Inf, 1.1, -.8)
+ggdraw() +
+  draw_plot(methspecplot(tempright, "sampling temperature [°C]", .92, .83, temptags, -Inf, Inf, 1, 1.2, alltemp, tempr2, Inf, -Inf, -.1, -.8, .1, .965, -22, -24, -22.1, -23.8)) +
+  draw_image(readPNG(here::here(figures_dir, "logos", "tempy.png")), width = .07, x=.16, y=-0.475) +
+  draw_image(readPNG(here::here(figures_dir, "logos", "tempy_low.png")), width = .07, x=0.93, y=-0.475)
+
+dev.off()
+```
+
+## S8 & S9. elevational and sampling temperature patterns of body size per species group
+
+```{r sizespecgroups}
+sizewbelevpred$group<-"wild bees"; sizehvelevpred$group<-"hoverflies"; sizebfelevpred$group<-"butterflies"; sizeorelevpred$group<-"grasshoppers"
+allsizeelev<-rbind(sizewbelevpred, sizehvelevpred, sizebfelevpred, sizeorelevpred)
+
+sizewbtemppred<-rbind(sizewbtemppred[sizewbtemppred$method=="malaise traps" &
+                           sizewbtemppred$tempright>=min(ss$tempsampl) &
+                           sizewbtemppred$tempright<=max(ss$tempsampl),],
+               sizewbtemppred[sizewbtemppred$method=="transect walks" &
+                           sizewbtemppred$tempright>=min(ss$samplpoll) &
+                           sizewbtemppred$tempright<=max(ss$samplpoll),])
+
+sizehvtemppred<-rbind(sizehvtemppred[sizehvtemppred$method=="malaise traps" &
+                           sizehvtemppred$tempright>=min(ss$tempsampl) &
+                           sizehvtemppred$tempright<=max(ss$tempsampl),],
+               sizehvtemppred[sizehvtemppred$method=="transect walks" &
+                           sizehvtemppred$tempright>=min(ss$samplpoll) &
+                           sizehvtemppred$tempright<=max(ss$samplpoll),])
+
+sizebftemppred<-rbind(sizebftemppred[sizebftemppred$method=="malaise traps" &
+                           sizebftemppred$tempright>=min(ss$tempsampl) &
+                           sizebftemppred$tempright<=max(ss$tempsampl),],
+               sizebftemppred[sizebftemppred$method=="transect walks" &
+                           sizebftemppred$tempright>=min(ss$samplpoll) &
+                           sizebftemppred$tempright<=max(ss$samplpoll),])
+
+sizeortemppred<-rbind(sizeortemppred[sizeortemppred$method=="malaise traps" &
+                           sizeortemppred$tempright>=min(ss$tempsampl[(!is.na(ss$size)) & ss$group=="grasshoppers" & ss$method=="malaise traps"]) & # to kick out NAs in min temp points of malaise traps
+                           sizeortemppred$tempright<=max(ss$tempsampl),],
+                 sizeortemppred[sizeortemppred$method=="transect walks" &
+                           sizeortemppred$tempright>=min(ss$samplor) &
+                           sizeortemppred$tempright<=max(ss$samplor),])
+
+sizewbtemppred$group<-"wild bees"; sizehvtemppred$group<-"hoverflies"; sizebftemppred$group<-"butterflies"; sizeortemppred$group<-"grasshoppers"
+allsizetemp<-rbind(sizewbtemppred, sizehvtemppred, sizebftemppred, sizeortemppred)
+
+# PLOT
+# image paths
+malaisetrap<-here::here(figures_dir, "logos", "malaisetrap.png")
+kescher<-here::here(figures_dir, "logos", "kescher.png")
+
+# dataframe for custom image adding
+icons<-as.data.frame(data.table("elev" = c(1830, 1830), "tempright"=c(15.2, 15.2), "size" = c(8.7, 8.4), "method"=c(rep(NA, 2)), "group"=c(rep("hoverflies", 2)), "image"=c(malaisetrap, kescher)))
+
+# plotting function
+sizespecplot<-function (var, xaxisname, dataframe, legposx, legposy) {
+  g <- ggplot_gtable(ggplot_build(
+    ggplot(aes({{var}}, size, col=method), data=dataframe) +
+    facet_wrap(vars(factor(group, levels = c("hoverflies", "wild bees", "butterflies", "grasshoppers"))), nrow = 2, scales = "free") +
+    geom_ribbon(aes(ymin = CI_lower, ymax = CI_upper, fill=method), alpha=.4, colour = NA, data = dataframe[dataframe$group %in% c( "wild bees", "butterflies"),]) + # add hoverflies for elevational patterns
+    geom_point(pch=16, alpha=0.6, data=ss) +
+    geom_line(aes(linetype=method, col=method), lwd=0.7, data = dataframe[dataframe$group %in% c("wild bees", "butterflies"),]) + # add hoverflies for elevational patterns
+    theme_classic() +
+    theme(axis.text = element_text(size=10),
+          axis.title = element_text(size=10),
+          strip.text = element_blank(), # suppress plot labelling by facetwrap
+          legend.position=c(.45, .59), legend.title = element_blank(), legend.text = element_blank(), legend.background = element_blank()) +
+    labs(x=xaxisname, y="body size proxy [mm]") +
+    scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),
+    name="sampling\nmethod") +
+    scale_fill_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"),name="sampling\nmethod") +
+    scale_linetype_manual(values = c("malaise traps"="solid", "transect walks"="dotdash"),
+      name="sampling\nmethod") +
+    #scale_x_continuous(n.breaks=4) + # for elevational patterns
+    scale_x_reverse(n.breaks=4) + # for sampling temperature patterns
+    geom_image(aes({{var}}, size, image = image), inherit.aes=F, data=icons, size=.13) +
+    guides(image="none", color=guide_legend(override.aes = list(size=2))) # exclude images from legend, define point appearance in legend
+  ))
+
+  # add logos
+  
+  facets <- grep("panel", g$layout$name)
+  
+  logos <- list(rasterGrob(readPNG(here::here(figures_dir, "logos", "orders", "diptera.png")),
+                             width=.14, x = .1, y = .92),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "orders", "lepidoptera.png")),
+                             width=.15, x = .1, y = .92),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "wbdip.png")),
+                             width=.14, x = .1, y = .92),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "divor.png")),
+                             width=.16, x = .1, y = .92))
+  
+  g2 <- with(g$layout[facets,],
+          gtable::gtable_add_grob(g, logos,
+                          t=t, l=l, b=b, r=r))
+  }
+
+# elevation
+png(here::here(suppl_dir, "elevpatterns-specsizes.png"), height=15, width=18, res=600, units = "cm")
+
+plot(sizespecplot(elev, "elevation [m a.s.l.]", allsizeelev))
+
+dev.off()
+
+# sampling temperature
+png(here::here(suppl_dir, "temppatterns-specsizes.png"), height=15, width=18, res=600, units = "cm")
+
+ggdraw() +
+  draw_plot(sizespecplot(tempright, "sampling temperature [°C]", allsizetemp)) +
+  draw_image(readPNG(here::here(figures_dir, "logos", "tempy.png")), width = .05, x=.03, y=-0.46) +
+  draw_image(readPNG(here::here(figures_dir, "logos", "tempy_low.png")), width = .05, x=0.95, y=-0.46)
+
+dev.off()
+```
+
+## S10. elevational body size distributions per species group
+
+```{r sizeelevspec}
+sizeall<-read.csv(here::here("data", "body_sizes_elevation.csv"), row.names = 1)
+
+# cluster elevation into classes
+sizeall$elevclass<-case_when(sizeall$elev<1000 ~ 500,
+                             sizeall$elev>=1000 & sizeall$elev<1500 ~ 1000,
+                             sizeall$elev>=1500 ~ 1500)
+
+# define level order for plot
+sizeall$group<-factor(sizeall$group, levels = c("hoverflies", "wild bees", "butterflies", "grasshoppers"))
+
+g <- ggplot_gtable(ggplot_build(
+  ggplot(aes(as.factor(elevclass), size, col=method, fill=method), data=sizeall) +
+    facet_wrap(vars(group), nrow = 2, scales = "free") +
+    geom_half_boxplot(col="black", outlier.shape = "*", outlier.size = 3, width=.9) +
+    geom_half_point(transformation = position_jitter(width = 0.07, height = 0), alpha=0.5, size=1.2, pch=16, width=.9) +
+    theme_classic() +
+    theme(legend.position = c(.92, .43),
+          legend.background = element_blank(),
+          strip.text = element_blank()) + # remove label balken from facet_wrap
+    scale_color_manual(values = c("malaise traps"="#21908dff", "transect walks"="#440154ff"), name=element_blank()) +
+    scale_fill_manual(values = c("malaise traps"="#21908d80", "transect walks"="#44015480"), name=element_blank()) +
+    scale_x_discrete(labels = c("644-999 m", "1000-1499 m", "1500-2034 m")) +
+    labs(x = "elevation class", y="body size proxy [mm]") +
+    guides(col=guide_legend(label.position = "left"), fill=guide_legend(label.position = "left")) # text left from color windows
+  ))
+
+  # Logos hinzufügen
+  
+  facets <- grep("panel", g$layout$name)
+  
+  logos <- list(rasterGrob(readPNG(here::here(figures_dir, "logos", "orders", "diptera.png")),
+                             width=.11, x = .06, y = .92),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "orders", "lepidoptera.png")),
+                             width=.11, x = .07, y = .92),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "wbdip.png")),
+                             width=.11, x = .06, y = .92),
+                  rasterGrob(readPNG(here::here(figures_dir, "logos", "orders", "orthoptera.png")),
+                             width=.13, x = .07, y = .92))
+  
+  g2 <- with(g$layout[facets,],
+          gtable::gtable_add_grob(g, logos,
+                          t=t, l=l, b=b, r=r))
+
+png(here::here("text", "supplementary", "body_size-elev-specgroups.png"), height=15, width=18, res=600, units = "cm")
+  
+plot(g2)
+
+dev.off()
+```
+
+## S11. beta diversity
+
+```{r beta}
+
+png(here::here(suppl_dir, "betadiversity.png"), height=8, width=11, res=600, units = "cm")
+
+pd %>% pivot_longer(cols=c(betadivj, betadipj),names_to = c("method"),values_to="beta") %>%
+  ggplot(aes(elev, beta, col=method, fill=method)) +
+  geom_point(size=1.5, alpha=0.6, shape=16) +
+  geom_smooth(aes(linetype=method), method="gam", formula = y ~ s(x, k=4), se = T, lwd = .8) +
+  theme_classic() +
+  labs(x="elevation [m a.s.l.]", y="beta diversity") +
+  theme(legend.position=c(.86, .93)) +
+  scale_color_manual(values = c("betadivj"="#21908dff", "betadipj"="#440154ff"),
+         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
+         name=element_blank()) +
+  scale_fill_manual(values = c("betadivj"="#21908dff", "betadipj"="#440154ff"),
+         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
+         name=element_blank()) +
+  scale_linetype_manual(values = c("betadivj"="solid", "betadipj"="dotdash"),
+         labels = c("betadivj"="malaise traps", "betadipj"="transect walks"),
+         name=element_blank())
 
 dev.off()
 ```

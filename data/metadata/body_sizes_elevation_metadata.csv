@@ -1,0 +1,7 @@
+﻿VARIABLE;EXPLANATION
+plot;plot-ID
+species;species name
+size;body size in mm as given in the literature (body length for bees, hoverflies & grasshoppers, wing length for butterflies)
+group;species group (wild bees, hoverflies, butterflies, grasshoppers)
+method;sampling method (malais traps/transect walks)
+elev;elevation of the plot [m.a.s.l.]

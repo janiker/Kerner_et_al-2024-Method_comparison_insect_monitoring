@@ -155,31 +155,7 @@ ordipsm
 
 # Supplementary Material
 
-## S6. body size comparisons
-
-```{r bodysizemeth}
-MT<-read.csv(here::here("data", "body_sizes.csv"), sep=";")
-
-body<-summary(lme(bodysize~method, random=~1|group, data=MT[!is.na(MT$bodysize),]))
-```
-
-## S7. beta diversity
-
-```{r betadiffelev}
-bdiv<-summary(gam(betadivj~s(elev, k=4), data=pd, method="REML"))
-bdip<-summary(gam(betadipj~s(elev, k=4), data=pd, method="REML"))
-
-# check for significant differences in beta diversity for each elevational section (lower elevations 500-1000 m, mid-elevations 1000-1500, highlands >1500 m)
-
-b <- pivot_longer(cols=c(betadivj, betadipj),names_to = c("method"),values_to="beta", data=pd)
-
-# T-Tests
-b1<-t.test(beta~method,data=b[b$elev<1000,])
-b2<-t.test(beta~method,data=b[b$elev>=1000 & b$elev<1500,])
-b3<-t.test(beta~method,data=b[b$elev>=1500,])
-```
-
-## S8 & S9. Elevational & sampling temperature patterns for individual pollinator groups
+## S6 & S7. Elevational & sampling temperature patterns for individual pollinator groups
 
 ```{r methodspec}
 # restructure data
@@ -215,4 +191,87 @@ tempwb<-summary(gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+
 elevhv<-summary(gam(spec.no~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=sm[sm$group=="hoverflies",], family=poisson, method="REML"))
 
 temphv<-summary(gam(spec.no~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=sm[sm$group=="hoverflies",], family=poisson, method="REML"))
+```
+
+## S8 & S9. elevational and sampling temperature patterns of body size per species group
+
+```{r bodysizespecgroups}
+ss<-pivot_longer(data=pd, cols=c(wbsizediv, hvsizediv, bfsizediv, orsizediv, wbsizedip, hvsizedip, bfsizedip, orsizedip),names_to = c("name"),values_to="size") 
+
+ss$method <-case_when(ss$name %in% c("wbsizediv", "hvsizediv", "bfsizediv", "orsizediv") ~ "malaise traps",
+            ss$name %in% c("wbsizedip", "hvsizedip", "bfsizedip", "orsizedip") ~ "transect walks") # define method
+ss$method<-factor(ss$method, ordered = T) # factor needs to be ordered for ANOVA like GAM summary
+
+ss$group <-case_when(ss$name %in% c("wbsizediv", "wbsizedip") ~ "wild bees",
+                     ss$name %in% c("hvsizediv", "hvsizedip") ~ "hoverflies",
+                     ss$name %in% c("bfsizediv", "bfsizedip") ~ "butterflies",
+                     ss$name %in% c("orsizediv", "orsizedip") ~ "grasshoppers") # define species groups
+ss$group<-factor(ss$group, ordered = T)
+
+# adjusting sample temperature to use only daily means of sampling day for transect walks surveys
+ss$tempright <-case_when(ss$name == "wbsizedip" ~ ss$samplwb,
+                         ss$name == "hvsizedip" ~ ss$samplhv,
+                         ss$name == "bfsizedip" ~ ss$samplbf,
+                         ss$name == "orsizedip" ~ ss$samplor,
+                         ss$name %in% c("wbsizediv", "hvsizediv", "bfsizediv", "orsizediv") ~ ss$tempsampl)
+
+ss$plot<-as.factor(ss$plot)
+
+# separated tests elevation~method each group
+# wild bees
+sizewbelev<-summary(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=ss[ss$group=="wild bees",], method="REML"))
+
+sizewbelevpred<-get_gam_predictions(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method, data=ss[ss$group=="wild bees",], method="REML"), elev, series_length = 100*(max(ss$elev)-min(ss$elev))+1)
+
+# hoverflies
+sizehvelev<-summary(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=ss[ss$group=="hoverflies",], method="REML"))
+
+sizehvelevpred<-get_gam_predictions(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method, data=ss[ss$group=="hoverflies",], method="REML"), elev, series_length = 100*(max(ss$elev)-min(ss$elev))+1)
+
+# butterflies
+sizebfelev<-summary(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=ss[ss$group=="butterflies",], method="REML"))
+
+sizebfelevpred<-get_gam_predictions(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method, data=ss[ss$group=="butterflies",], method="REML"), elev, series_length = 100*(max(ss$elev)-min(ss$elev))+1)
+
+# grasshoppers
+sizeorelev<-summary(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method+s(plot, bs="re"), data=ss[ss$group=="grasshoppers",], method="REML"))
+
+sizeorelevpred<-get_gam_predictions(gam(size~s(elev, k=4)+s(elev,by=method,k=4)+method, data=ss[ss$group=="grasshoppers",], method="REML"), elev, series_length = 100*(max(ss$elev)-min(ss$elev))+1)
+
+# separated tests sampling temperature~method each group
+# wild bees
+sizewbtemp<-summary(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=ss[ss$group=="wild bees",], method="REML"))
+
+sizewbtemppred<-get_gam_predictions(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method, data=ss[ss$group=="wild bees",], method="REML"), tempright, series_length = 100*(round(max(ss$tempright), 2)-round(min(ss$tempright), 2))+1)
+
+# hoverflies
+sizehvtemp<-summary(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=ss[ss$group=="hoverflies",], method="REML"))
+
+sizehvtemppred<-get_gam_predictions(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method, data=ss[ss$group=="hoverflies",], method="REML"), tempright, series_length = 100*(round(max(ss$tempright), 2)-round(min(ss$tempright), 2))+1)
+
+# butterflies
+sizebftemp<-summary(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=ss[ss$group=="butterflies",], method="REML"))
+
+sizebftemppred<-get_gam_predictions(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method, data=ss[ss$group=="butterflies",], method="REML"), tempright, series_length = 100*(round(max(ss$tempright), 2)-round(min(ss$tempright), 2))+1)
+
+# grasshoppers
+sizeortemp<-summary(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4)+s(plot, bs="re"), data=ss[ss$group=="grasshoppers",], method="REML"))
+
+sizeortemppred<-get_gam_predictions(gam(size~s(tempright, k=4)+s(tempright,by=method,k=4)+method+s(elev, k=4), data=ss[ss$group=="grasshoppers",], method="REML"), tempright, series_length = 100*(round(max(ss$tempright), 2)-round(min(ss$tempright), 2))+1)
+```
+
+## S7. beta diversity
+
+```{r betadiffelev}
+bdiv<-summary(gam(betadivj~s(elev, k=4), data=pd, method="REML"))
+bdip<-summary(gam(betadipj~s(elev, k=4), data=pd, method="REML"))
+
+# check for significant differences in beta diversity for each elevational section (lower elevations 500-1000 m, mid-elevations 1000-1500, highlands >1500 m)
+
+b <- pivot_longer(cols=c(betadivj, betadipj),names_to = c("method"),values_to="beta", data=pd)
+
+# T-Tests
+b1<-t.test(beta~method,data=b[b$elev<1000,])
+b2<-t.test(beta~method,data=b[b$elev>=1000 & b$elev<1500,])
+b3<-t.test(beta~method,data=b[b$elev>=1500,])
 ```
