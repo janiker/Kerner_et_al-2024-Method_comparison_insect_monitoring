@@ -38,10 +38,10 @@ When using the __data available__ in this repository, please cite the original p
 
 **Publication**
 
-> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2024) Transect walks and malaise traps differ in temperature sensitivity but reveal consistent drivers of pollinator richness. *Insect Conservation and Diversity*. DOI: [10.1111/ICAD.12743](https://doi.org/10.1111/ICAD.12743)
+> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2024). Transect walks and malaise traps differ in temperature sensitivity but reveal consistent drivers of pollinator richness. *Insect Conservation and Diversity*. DOI: [10.1111/ICAD.12743](https://doi.org/10.1111/ICAD.12743)
 
 **Dataset**
 
-> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2024) Data and code for Kerner et al. (2024) Insect Conservation and Diversity [Data set]. *Zenodo*. DOI: [10.XXXX](https://doi.org/10.XXXX)
+> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2024). Data and code for Kerner et al. (2024) Insect Conservation and Diversity [Data set]. *Zenodo*. DOI: [10.XXXX](https://doi.org/10.XXXX)
 
 Contact janika.kerner@uni-wuerzburg.de for any further information. 
