@@ -42,6 +42,6 @@ When using the __data available__ in this repository, please cite the original p
 
 **Dataset**
 
-> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2024). Data and code for Kerner et al. (2024) Insect Conservation and Diversity [Dataset]. *Zenodo*. DOI: [10.XXXX](https://doi.org/10.XXXX)
+> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2024). Data and code for Kerner et al. (2024) Insect Conservation and Diversity [Dataset]. *Zenodo*. DOI: [10.5281/zenodo.10998249](https://zenodo.org/doi/10.5281/zenodo.10998249)
 
 Contact janika.kerner@uni-wuerzburg.de for any further information. 
