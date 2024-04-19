@@ -1,4 +1,4 @@
-# Transect walks and malaise traps differ in temperature sensitivity but reveal consistent drivers of pollinator richness (submitted)
+# Transect walks and malaise traps differ in temperature sensitivity but reveal consistent drivers of pollinator richness
 
 _Janika M. Kerner <a href="https://orcid.org/0000-0002-2355-081X"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height = "16"></a>, Sebastian König <a href="https://orcid.org/0000-0003-3253-8457"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height = "16"></a>, Fabienne Maihoff <a href="https://orcid.org/0000-0003-3246-3213"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height = "16"></a>, Lukas Bofinger, Nikki Sauer, Axel Ssymank, Peter Väth and Alice Classen <a href="https://orcid.org/0000-0002-7813-8806"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height = "16"></a>_  
 
@@ -6,7 +6,7 @@ _Janika M. Kerner <a href="https://orcid.org/0000-0002-2355-081X"><img src="http
 
 **Journal**: [Insect Conservation and Diversity](https://resjournals.onlinelibrary.wiley.com/journal/17524598)
 
-**DOI**: [10.XXXX](https://doi.org/10.XXXX)
+**DOI**: [10.1111/ICAD.12743](https://doi.org/10.1111/ICAD.12743)
 
 **Supplementary Material**: [link](https://XXX.pdf)
 
@@ -33,11 +33,6 @@ Contact janika.kerner@uni-wuerzburg.de for any further information.
 
 **Citation:**
 
-> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2023) Transect walks and malaise traps differ in temperature sensitivity but reveal consistent drivers of pollinator richness. https://doi.org/10.XXXX
+> Kerner JM, König S, Maihoff F, Bofinger L, Sauer N, Ssymank A, Väth P, Classen A (2024) Transect walks and malaise traps differ in temperature sensitivity but reveal consistent drivers of pollinator richness. DOI: 10.1111/ICAD.12743
 
 ***
-
-__Dataset DOIs__
-
-Data: [10.XXXX](https://doi.org/10.XXXX)  
-Code: [10.XXXX](https://doi.org/10.XXXX)
